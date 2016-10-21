@@ -1,14 +1,18 @@
-import ClientConfig
+import ClientConfig, Sources
 
+# Startup
 print("Loading config...")
 c = ClientConfig.load()
 
-print("Test value: " + c.TestValue)
+# Run
+print("Reading sources...")
+sources = Sources.getLocalSources(c.SourceLocation)
 
-print("Changing test value...")
+for src in sources.values():
+    print("Source #{0}: {1}".format(src.id, src.tag))
+
+
+# Shutdown
 c.TestValue = c.TestValue + '+'
-
-print("Test value: " + c.TestValue)
-
 print("Saving config...")
 ClientConfig.save(c)
