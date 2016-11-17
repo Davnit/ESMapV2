@@ -26,7 +26,13 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="ESMap_Client.py" />
+    <Compile Include="Calls.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Sources.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="WebClient.py">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
