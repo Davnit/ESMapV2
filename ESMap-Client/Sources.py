@@ -115,7 +115,7 @@ class CallSource():
         self.tag = tag          # Short identifer for the source (usually agency abbreviation)
         self.url = url          # Location of source data
         self.parser = parser    # The path to the script responsible for parsing the source file
-        self.interval = 300     # Time to wait between update checks, in seconds
+        self.interval = 60      # Time to wait between update checks, in seconds
 
         self.last_update = None # Last time this source was checked
 

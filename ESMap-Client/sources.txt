@@ -1,3 +1,3 @@
-OCSO http://www.ocso.com/Portals/0/CFS_FEED/activecalls.xml ocso.py 300
-OPD-A http://www1.cityoforlando.net/opd/activecalls/activecad.xml opd.py 420
-OPD-S http://www1.cityoforlando.net/opd/activecalls/selfcad.xml opd.py 420
+OCSO http://www.ocso.com/Portals/0/CFS_FEED/activecalls.xml ocso.py 60
+OPD-A http://www1.cityoforlando.net/opd/activecalls/activecad.xml opd.py 60
+OPD-S http://www1.cityoforlando.net/opd/activecalls/selfcad.xml opd.py 60
