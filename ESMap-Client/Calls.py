@@ -1,4 +1,31 @@
 
+def merge(old, new):
+    # Hash the calls in each collection
+    oldCalls = { c.getHash() : c for c in old }
+    newCalls = { c.getHash() : c for c in new }
+
+    final = { }
+
+    # Find newly added calls (in new but not old)
+    added = { }
+    for k, c in newCalls.items():
+        if not k in oldCalls:
+            added[k] = c
+
+    # Determine which calls have been removed/expired (in old but not new)
+    removed = { }
+    for k, c in oldCalls.items():
+        if (not k in newCalls):
+            removed[k] = c
+        else:
+            final[k] = c
+
+    # Add new calls to the final collection
+    final.update(added)
+
+    return final, added, removed
+    
+
 class CallData():
     def __init__(self, meta):
         self.meta = meta        # An array of information describing the call
@@ -15,6 +42,9 @@ class CallData():
             s += " @ " + location
 
         return s
+
+    def getHash(self):
+        return hash(str(self.meta))
 
 
         
