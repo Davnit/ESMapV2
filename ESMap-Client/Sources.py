@@ -7,12 +7,12 @@ defaultLocalSourcePath = 'sources.txt'
 missing_parsers = [ ]
 
 # Retreives a list of call sources from a local file
-def getLocalSources(path=None):
-    if path is None:
-        path = defaultLocalSourcePath
+def getLocalSources(sourcePath=None):
+    if sourcePath is None:
+        sourcePath = defaultLocalSourcePath
 
     # Read the file
-    data = open(path, 'r').readlines()
+    data = open(sourcePath, 'r').readlines()
 
     i = 1
     sources = { }
@@ -23,14 +23,15 @@ def getLocalSources(path=None):
 
         if len(s) < 3:
             print("ERROR! Source #{0} is missing metadata. Requires: TAG URL PARSER - only {1} provided.".format(i, len(s)))
-        
-        source = CallSource(s[0], s[1], s[2])
+
+        source = CallSource(s[0], s[1], getParserPath(s[2]))
         source.id = i
 
         # Parse optional metadata
         if len(s) > 3:
             source.interval = int(s[3])
 
+        verifyParser(source.parser)
         sources[i] = source
         i += 1
 
@@ -45,18 +46,36 @@ def needsUpdate(source):
 
 # Returns False if the source is missing its parser
 def canCheck(source):
-    return (not source.parser == None) and (not source.parser in missing_parsers)
+    if source.parser == None:
+        return False
+    
+    return verifyParser(source.parser)
+
+# Returns the full path to a parser
+def getParserPath(parser):
+    if not path.isabs(parser):
+        parser = path.normpath(path.join('parsers', parser))
+    return parser
+
+# Verifies that a parser file exists
+def verifyParser(parser):
+    if not path.isfile(parser):
+        if not parser in missing_parsers:
+            missing_parsers.append(parser)
+            print("WARNING! Missing source parser: {0}".format(parser))
+        return False
+    else:
+        if parser in missing_parsers:
+            missing_parsers.remove(parser)
+            print("NOTICE! Source found: {0}".format(parser))
+        return True
+
 
 
 # Returns a list of calls being reported by a source.
 def check(source):
-    parser = path.normpath(path.join('parsers', source.parser))
-
-    # Check that the parser exists
-    if not path.isfile(parser):
-        if not parser in missing_parsers:
-            missing_parsers.append(parser)
-            print("WARNING! Missing source parser: {0}".format(source.parser))
+    # Confirm that the source can be checked and parsed
+    if not canCheck(source):
         return False
 
     # Retrieve the page contents
@@ -69,7 +88,7 @@ def check(source):
 
     # Compile and run the parser script
     try:
-        exec(compile(open(parser, 'rb').read(), parser, 'exec'))
+        exec(compile(open(source.parser, 'rb').read(), source.parser, 'exec'))
     except Exception as ex:
         print("ERROR! Problem occurred while parsing source {0}: {1}".format(source.tag, ex))
         return False
@@ -95,7 +114,7 @@ class CallSource():
         self.id = None
         self.tag = tag          # Short identifer for the source (usually agency abbreviation)
         self.url = url          # Location of source data
-        self.parser = None      # The path to the script responsible for parsing the source file
+        self.parser = parser    # The path to the script responsible for parsing the source file
         self.interval = 300     # Time to wait between update checks, in seconds
 
         self.last_update = None # Last time this source was checked

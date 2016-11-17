@@ -17,10 +17,10 @@ while True:
     for src in sources.values():
         if Sources.needsUpdate(src) and Sources.canCheck(src):
             calls = Sources.check(src)
-
-            print("UPDATE FROM {0}: {1} active calls".format(src.tag, len(calls)))
-            for call in calls:
-                print("\t" + call.getShortDisplayString())
+            if calls:
+                print("UPDATE FROM {0}: {1} active calls".format(src.tag, len(calls)))
+                for call in calls:
+                    print("\t" + call.getShortDisplayString())
 
     time.sleep(c.TickInterval)
 
