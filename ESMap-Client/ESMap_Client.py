@@ -31,7 +31,7 @@ while True:
                 if len(added) > 0 or len(removed) > 0:
                     print("UPDATE FROM {0}: {1} active calls ({2} new, {3} expired)".format(src.tag, len(result), len(added), len(removed)))
                     for call in added.values():
-                        print("\tNEW:", call.getShortDisplayString())
+                        print("\tNEW:", call.getLongDisplayString())
                     for call in removed.values():
                         print("\tEXP:", call.getShortDisplayString())
 

@@ -43,6 +43,10 @@ class CallData():
 
         return s
 
+    def getLongDisplayString(self):
+        s = "{0}: {1} [{2}] [#{3}]"
+        return s.format(self.source.tag, self.getShortDisplayString(), self.meta["call_type"], self.meta["call_number"])
+
     def getHash(self):
         return hash(str(self.meta))
 
