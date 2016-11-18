@@ -20,6 +20,7 @@ def save(c, path=None):
     p.add_section('MAIN')
     if c.SourceLocation is not None: p.set('MAIN', 'source_location', c.SourceLocation)
     p.set('MAIN', 'tick_interval', str(c.TickInterval))
+    p.set('MAIN', 'ingest_url', c.IngestUrl)
 
     with open(path, 'w') as file:
         p.write(file)
@@ -27,4 +28,5 @@ def save(c, path=None):
 class Config():
     def __init__(self, p):         
         self.SourceLocation = p.get('MAIN', 'source_location', fallback=None)       # Path to local file containing source metadata
-        self.TickInterval = int(p.get('MAIN', 'tick_interval', fallback="60"))        # Time to wait between checking if sources need to be updated
+        self.TickInterval = int(p.get('MAIN', 'tick_interval', fallback="60"))      # Time to wait between checking if sources need to be updated
+        self.IngestUrl = p.get('MAIN', 'ingest_url', fallback=None)                 # URL for the script that receives call data

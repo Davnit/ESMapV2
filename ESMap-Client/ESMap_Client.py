@@ -1,6 +1,6 @@
 
-import time, sys
-import ClientConfig, Sources, Calls
+import time, sys, json
+import ClientConfig, Sources, Calls, WebClient
 
 # Startup
 print("Loading config...")
@@ -34,6 +34,18 @@ while True:
                         print("\tNEW:", call.getLongDisplayString())
                     for call in removed.values():
                         print("\tEXP:", call.getShortDisplayString())
+
+                    # Test report
+                    if len(c.IngestUrl) > 0:
+                        report = { 
+                            "source": src.id, 
+                            "new": [ c.meta for c in added.values() ], 
+                            "expired": [ c.meta for c in removed.values() ]
+                        }
+
+                        ok, response = WebClient.postData(c.IngestUrl, { "calldata": json.dumps(report, separators=(',',':')) })
+                        print("Post data: " + str(ok))
+                        print("Response: " + str(response))
 
     time.sleep(c.TickInterval)
 
