@@ -99,8 +99,10 @@ def check(source):
     # Create call objects from the parser results and tag them
     calls = [ ]
     for r in results:
-        c = Calls.CallData(r)
+        c = Calls.CallData(r["meta"])
         c.source = source
+        c.key = r["key"]
+        c.category = r["category"]
 
         calls.append(c)
 

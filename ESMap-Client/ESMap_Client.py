@@ -39,8 +39,8 @@ while True:
                     if len(c.IngestUrl) > 0:
                         report = { 
                             "source": src.id, 
-                            "new": [ c.meta for c in added.values() ], 
-                            "expired": [ c.meta for c in removed.values() ]
+                            "new": [ v.getReportData() for v in added.values() ], 
+                            "expired": [ v.getKey() for v in removed.values() ]
                         }
 
                         ok, response = WebClient.postData(c.IngestUrl, { "calldata": json.dumps(report, separators=(',',':')) })

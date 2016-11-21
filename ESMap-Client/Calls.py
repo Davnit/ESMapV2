@@ -1,8 +1,8 @@
 
 def merge(old, new):
     # Hash the calls in each collection
-    oldCalls = { c.getHash() : c for c in old }
-    newCalls = { c.getHash() : c for c in new }
+    oldCalls = { c.getKey() : c for c in old }
+    newCalls = { c.getKey() : c for c in new }
 
     final = { }
 
@@ -29,6 +29,8 @@ def merge(old, new):
 class CallData():
     def __init__(self, meta):
         self.meta = meta        # An array of information describing the call
+        self.key = None         # A semi-unique key used to identify the call
+        self.category = None    # The type of call (Police, Fire, EMS, etc)
         self.source = None      # The CallSource object representing the source of the call
 
     # Returns a short string identifying the call
@@ -45,10 +47,22 @@ class CallData():
 
     def getLongDisplayString(self):
         s = "{0}: {1} [{2}] [#{3}]"
-        return s.format(self.source.tag, self.getShortDisplayString(), self.meta["call_type"], self.meta["call_number"])
+        return s.format(self.source.tag, self.getShortDisplayString(), self.category, self.meta["call_number"])
+    
+    def getKey(self):
+        if self.key is None:
+            return hash(str(self.meta))
+        else:
+            return self.key
 
-    def getHash(self):
-        return hash(str(self.meta))
+    # Returns a dictionary with values representing known call data
+    def getReportData(self):
+        data = { }
+        data["key"]         = self.key
+        data["category"]    = self.category
+        data["meta"]        = self.meta
+
+        return data
 
 
         

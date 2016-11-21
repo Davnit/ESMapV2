@@ -14,23 +14,24 @@ for idx in range(1, len(calls)):
         call = calls[idx].split("</CALL>")[0]
     
         # Parse page data
-        row_data = dict()
-        row_data["call_time"]   = getValue(call, "ENTRYTIME")   
-        row_data["location"]    = getValue(call, "LOCATION")
-        row_data["sector"]      = getValue(call, "SECTOR")
-        row_data["zone"]        = getValue(call, "ZONE")
-        row_data["district"]    = getValue(call, "RD")
-        row_data["description"] = getValue(call, "DESC")
+        row_data = { }
         
-        # OCSO doesn't provide unique call numbers so combine the number they give with the date
-        num = call.split("INCIDENT=\"")[1].split("\">")[0]
-        cd = row_data["call_time"].split()[0].split("-")
-        num = '-'.join([ cd[2], cd[0], cd[1], num ])
-        row_data["call_number"] = num
+        meta = { }
+        meta["call_number"]         = call.split("INCIDENT=\"")[1].split("\">")[0]
+        meta["call_time"]           = getValue(call, "ENTRYTIME")   
+        meta["location"]            = getValue(call, "LOCATION")
+        meta["sector"]              = getValue(call, "SECTOR")
+        meta["zone"]                = getValue(call, "ZONE")
+        meta["district"]            = getValue(call, "RD")
+        meta["description"]         = getValue(call, "DESC")
+        
+        # OCSO doesn't provide unique call numbers so we need to come up with our own semi-unique key
+        cd = meta["call_time"].split()[0].split("-")
+        row_data["key"] = '-'.join([ "OCSO", ''.join([ cd[2], cd[0], cd[1] ]), meta["call_number"] ])
         
         # Interpret call type from description
         call_type = "Police"
-        desc = row_data["description"].upper()
+        desc = meta["description"].upper()
         
         if "FIRE" in desc:
             call_type = "Fire"
@@ -41,9 +42,10 @@ for idx in range(1, len(calls)):
         elif ("PATROL" in desc) or (desc == "HOUSE/BUS./AREA/CHECK"):
             call_type = "Patrol"
             
-        row_data["call_type"] = call_type
+        row_data["category"] = call_type
      
         # Add call to list
+        row_data["meta"] = meta
         results.append(row_data)
     except Exception:
         pass
