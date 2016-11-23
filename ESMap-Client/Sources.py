@@ -3,13 +3,10 @@ import WebClient, Calls
 from os import path
 from datetime import datetime
 
-defaultLocalSourcePath = 'sources.txt'
 missing_parsers = [ ]
 
 # Retreives a list of call sources from a local file
-def getLocalSources(sourcePath=None):
-    if sourcePath is None:
-        sourcePath = defaultLocalSourcePath
+def getLocalSources(sourcePath):
 
     # Read the file
     data = open(sourcePath, 'r').readlines()
@@ -120,5 +117,7 @@ class CallSource():
         self.interval = 60      # Time to wait between update checks, in seconds
 
         self.last_update = None # Last time this source was checked
+
+        
 
     
