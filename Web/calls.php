@@ -5,7 +5,7 @@
     $statement = $db->prepare("SELECT source, cid FROM calls WHERE expired IS NULL ORDER BY id ASC");
     if (!$statement->execute())
     {
-        print("FAIL " . $statement->errorInfo());
+        die("FAIL " . $statement->errorInfo());
     }
     
     $result = $statement->fetchAll();
@@ -19,7 +19,7 @@
     }
     else
     {
-        print("FAIL No results");
+        die("FAIL No results");
     }
     
 ?>
