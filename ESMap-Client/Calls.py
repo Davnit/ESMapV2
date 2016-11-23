@@ -27,27 +27,35 @@ def merge(old, new):
     
 
 class CallData():
-    def __init__(self, meta):
-        self.meta = meta        # An array of information describing the call
-        self.key = None         # A semi-unique key used to identify the call
+    def __init__(self, data):
+        if isinstance(data, str):
+            self.meta = None    
+            self.key = data     # A semi-unique key used to identify the call
+        else:
+            self.meta = data    # An array of information describing the call
+            self.key = None
+
         self.category = None    # The type of call (Police, Fire, EMS, etc)
         self.source = None      # The CallSource object representing the source of the call
 
     # Returns a short string identifying the call
     #   Example: Burglary @ 123 Main St
     def getShortDisplayString(self):
-        s = self.meta['description']
+        if self.meta is None:
+            return "No data" if self.key is None else self.key
+
+        s = self.meta["description"] if "description" in self.meta else "Unidentified"
         
         # Append the location if available
-        location = self.meta['location']
+        location = self.meta["location"] if "location" in self.meta else ""
         if len(location) > 0:
             s += " @ " + location
 
         return s
 
     def getLongDisplayString(self):
-        s = "{0}: {1} [{2}] [#{3}]"
-        return s.format(self.source.tag, self.getShortDisplayString(), self.category, self.meta["call_number"])
+        s = "{0}: {1} [{2}]"
+        return s.format(self.getKey(), self.getShortDisplayString(), self.category)
     
     def getKey(self):
         if self.key is None:
@@ -57,12 +65,8 @@ class CallData():
 
     # Returns a dictionary with values representing known call data
     def getReportData(self):
-        data = { }
-        data["key"]         = self.key
-        data["category"]    = self.category
-        data["meta"]        = self.meta
+        return { "key": self.key, "category": self.category, "meta": self.meta }
 
-        return data
 
 
         
