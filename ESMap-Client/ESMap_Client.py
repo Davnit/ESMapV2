@@ -6,8 +6,16 @@ import ClientConfig, Sources, Calls, WebClient
 print("Loading config...")
 c = ClientConfig.load()
 
-print("Reading sources...")
-sources = Sources.getLocalSources(c.SourceLocation)
+print("Obtaining sources...")
+sources = None
+if c.UseRemoteServer:
+    sources = Sources.getRemoteSources(c.SourceLocation)
+else:
+    sources = Sources.getLocalSources(c.SourceLocation)
+
+if len(sources) == 0:
+    print("No sources found.")
+    sys.exit()
 
 active_calls = { }
 

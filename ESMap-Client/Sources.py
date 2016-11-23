@@ -34,6 +34,29 @@ def getLocalSources(sourcePath):
 
     return sources
 
+def getRemoteSources(sourceUrl):
+    sources = { }
+
+    # Request sources from remote server
+    ok, response = WebClient.openUrl(sourceUrl)
+    if ok and not response.startswith("FAIL"):
+        data = response.split("\r\n")
+
+        for itm in list(filter(None, data)):
+            s = itm.split("|")
+
+            # Web sources should always have all of the data
+            source = CallSource(s[1], s[2], getParserPath(s[3]))
+            source.id = int(s[0])
+            source.interval = int(s[4])
+
+            verifyParser(source.parser)
+            sources[source.id] = source
+    else:
+        print("ERROR! Unable to obtain sources: " + str(response))
+
+    return sources
+
 # Returns True if the specified source is due for an update.
 def needsUpdate(source):
     if source.last_update == None:
