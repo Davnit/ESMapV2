@@ -11,3 +11,14 @@ CREATE TABLE `calls` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `cid` (`cid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+
+DROP TABLE IF EXISTS `sources`;
+CREATE TABLE `sources` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `tag` varchar(10) NOT NULL,
+  `url` varchar(255) CHARACTER SET ascii NOT NULL,
+  `parser` varchar(25) CHARACTER SET ascii NOT NULL,
+  `interval` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
