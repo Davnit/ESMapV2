@@ -13,7 +13,26 @@ active_calls = { }
 
 for src in sources.values():
     print("Source #{0}: {1} => {2} [Can check?: {3}]".format(src.id, src.tag, src.parser, Sources.canCheck(src)))
-    active_calls[src] = [ ]
+    active_calls[src.id] = [ ]
+
+# Sync
+if c.UseRemoteServer and len(c.SyncUrl) > 0:
+    print("Syncing with server: {0}".format(c.SyncUrl.split("://")[1].split("/")[0]))
+
+    ok, response = WebClient.openUrl(c.SyncUrl)
+    if ok:
+        if response.startswith("FAIL"):
+            print("\t... " + response)
+        else:
+            calls = response.split("\r\n")
+            for call in list(filter(None, calls)):
+                s = call.split("|")
+
+                src = sources[int(s[0])]
+                active_calls[src.id].append(Calls.CallData(s[1]))     # Add a dummy CallData instance, with only the key.
+                print("\t{0} [{1}]: {2}".format(src.tag, src.id, s[1]))
+    else:
+        print("\t... failed: " + response)
 
 # Run
 while True:
@@ -24,8 +43,8 @@ while True:
 
             # If data was returned, merge the new data with the existing
             if calls:
-                result, added, removed = Calls.merge(active_calls[src], calls)
-                active_calls[src] = result.values()
+                result, added, removed = Calls.merge(active_calls[src.id], calls)
+                active_calls[src.id] = result.values()
 
                 # Show the changes
                 if len(added) > 0 or len(removed) > 0:
@@ -36,7 +55,7 @@ while True:
                         print("\tEXP:", call.getShortDisplayString())
 
                     # Test report
-                    if len(c.IngestUrl) > 0:
+                    if c.UseRemoteServer and len(c.IngestUrl) > 0:
                         report = { 
                             "source": src.id, 
                             "new": [ v.getReportData() for v in added.values() ], 
@@ -44,8 +63,8 @@ while True:
                         }
 
                         ok, response = WebClient.postData(c.IngestUrl, { "calldata": json.dumps(report, separators=(',',':')) })
-                        print("Post data: " + str(ok))
-                        print("Response: " + str(response))
+                        if not ok or response.startswith("FAIL"):
+                            print("\tReport failed: " + response)
 
     time.sleep(c.TickInterval)
 
