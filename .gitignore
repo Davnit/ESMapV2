@@ -244,3 +244,4 @@ ModelManifest.xml
 # FAKE - F# Make
 .fake/
 /ESMap-Client/__pycache__
+ESMap-Client/config.ini
