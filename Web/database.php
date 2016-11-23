@@ -6,7 +6,7 @@
     $db = new PDO($dsn, $config["db_user"], $config["db_pass"]);
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
     
-    function insertRows($table, $fields, $data)
+    function insertRows($table, $fields, $data, $ignoreDuplicates = false)
     {
         global $db;
         
@@ -23,6 +23,10 @@
         }
         
         $sql = sprintf("INSERT INTO %s (%s) VALUES %s", $table, implode(",", $fields), implode(",", $rows));
+        if ($ignoreDuplicates)
+        {
+            $sql .= " ON DUPLICATE KEY UPDATE " . $fields[0] . "=" . $fields[0];
+        }
         $db->prepare($sql)->execute($values);
         
         $db->commit();

@@ -24,7 +24,7 @@
         $td[] = [ $source, $row["key"], $row["category"], json_encode($row["meta"]) ];
     }
     
-    if (count($data["new"]) > 0) insertRows("calls", $fields, $td);
+    if (count($data["new"]) > 0) insertRows("calls", $fields, $td, true);
     if (count($data["expired"]) > 0) updateTimestamps("calls", "expired", "cid", $data["expired"]);
     
     printf("Source: %s\r\n", $source);
