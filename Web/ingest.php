@@ -1,13 +1,24 @@
 <?php
 
+    function reportError($message)
+    {
+        $response = array();
+        $response["status"]["success"] = false;
+        $response["status"]["message"] = $message;
+        echo json_encode($response);
+        return;
+    }
+    
     if (!isset($_POST["calldata"])) {
-        die("ERROR: No data provided.");
+        reportError("No data provided.");
+        die();
     }
     
     $data = json_decode($_POST["calldata"], true);
     
     if ($data == null) {
-        die("ERROR: Invalid data: " . json_last_error_msg());
+        reportError("Invalid data: " . json_last_error_msg());
+        die();
     }
     
     // Access the database
@@ -24,11 +35,21 @@
         $td[] = [ $source, $row["key"], $row["category"], json_encode($row["meta"]) ];
     }
     
-    if (count($data["new"]) > 0) insertRows("calls", $fields, $td, true);
-    if (count($data["expired"]) > 0) updateTimestamps("calls", "expired", "cid", $data["expired"]);
+    # Update the database
+    if (count($data["new"]) > 0) 
+    {
+        $newCount = insertRows("calls", $fields, $td, true);
+    }
+    if (count($data["expired"]) > 0) 
+    {
+        $expCount = updateTimestamps("calls", "expired", "cid", $data["expired"]);
+    }
     
-    printf("Source: %s\r\n", $source);
-    printf("New calls: %d\r\n", count($data["new"]));
-    printf("Expired calls: %d", count($data["expired"]));
+    $response = array();
+    $response["status"]["success"] = true;
+    $response["status"]["added"] = isset($newCount) ? $newCount : 0;
+    $response["status"]["expired"] = isset($expCount) ? $expCount : 0;
+    
+    echo json_encode($response);
 
 ?>

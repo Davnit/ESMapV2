@@ -27,9 +27,13 @@
         {
             $sql .= " ON DUPLICATE KEY UPDATE " . $fields[0] . "=" . $fields[0];
         }
-        $db->prepare($sql)->execute($values);
+        
+        $statement = $db->prepare($sql);
+        $statement->execute($values);
         
         $db->commit();
+        
+        return $statement->rowCount();
     }
     
     function updateTimestamps($table, $stampField, $keyField = "", $keyValues = null)
@@ -41,15 +45,19 @@
         if (strlen($keyField) > 0 and $keyValues !== null and sizeof($keyValues) > 0)
         {
             $sql = sprintf("UPDATE %s SET %s = NOW() WHERE %s IN (%s)", $table, $stampField, $keyField, implode(",", array_fill(0, sizeof($keyValues), "?")));
-            $db->prepare($sql)->execute($keyValues);
+            $statement = $db->prepare($sql);
+            $statement->execute($keyValues);
         }
         else
         {
             $sql = sprintf("UPDATE %s SET %s = NOW()", $table, $stampField);
-            $db->prepare($sql)->execute();
+            $statement = $db->prepare($sql);
+            $statement->execute();
         }
         
         $db->commit();
+        
+        return $statement->rowCount();
     }
 
 ?>

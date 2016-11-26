@@ -71,8 +71,17 @@ while True:
                         }
 
                         ok, response = WebClient.postData(c.IngestUrl, { "calldata": json.dumps(report, separators=(',',':')) })
-                        if not ok or response.startswith("FAIL"):
-                            print("\tReport failed: " + response)
+                        if ok:
+                            data = json.loads(response)
+                            if data["status"]["success"] == True:
+                                success = True
+                                if data["status"]["added"] != len(added): success = False
+                                if data["status"]["expired"] != len(removed): success = False
+
+                                if not success:
+                                    print("Reporting discrepancy. Server added {0} rows, expired {1}.".format(data["status"]["added"], data["status"]["expired"]))
+                            else:
+                                print("Report failed. Reason: " + data["status"]["message"])
 
     time.sleep(c.TickInterval)
 
