@@ -29,6 +29,9 @@
     <Compile Include="Calls.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Reporting.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Sources.py">
       <SubType>Code</SubType>
     </Compile>

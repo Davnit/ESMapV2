@@ -1,6 +1,6 @@
 
 import time, sys, json
-import ClientConfig, Sources, Calls, WebClient
+import ClientConfig, Sources, Calls, WebClient, Reporting
 
 # Startup
 print("Loading config...")
@@ -54,34 +54,16 @@ while True:
                 result, added, removed = Calls.merge(active_calls[src.id], calls)
                 active_calls[src.id] = result.values()
 
+                report = Reporting.SourceUpdateReport(src, result, added, removed)
+
                 # Show the changes
-                if len(added) > 0 or len(removed) > 0:
-                    print("UPDATE FROM {0}: {1} active calls ({2} new, {3} expired)".format(src.tag, len(result), len(added), len(removed)))
-                    for call in added.values():
-                        print("\tNEW:", call.getLongDisplayString())
-                    for call in removed.values():
-                        print("\tEXP:", call.getShortDisplayString())
+                if report.hasChanges():
+                    report.printChanges()
 
-                    # Test report
+                    # Update the server with new data
                     if c.UseRemoteServer and len(c.IngestUrl) > 0:
-                        report = { 
-                            "source": src.id, 
-                            "new": [ v.getReportData() for v in added.values() ], 
-                            "expired": [ v.getKey() for v in removed.values() ]
-                        }
+                        report.sendChangeReport(c.IngestUrl)
 
-                        ok, response = WebClient.postData(c.IngestUrl, { "calldata": json.dumps(report, separators=(',',':')) })
-                        if ok:
-                            data = json.loads(response)
-                            if data["status"]["success"] == True:
-                                success = True
-                                if data["status"]["added"] != len(added): success = False
-                                if data["status"]["expired"] != len(removed): success = False
-
-                                if not success:
-                                    print("Reporting discrepancy. Server added {0} rows, expired {1}.".format(data["status"]["added"], data["status"]["expired"]))
-                            else:
-                                print("Report failed. Reason: " + data["status"]["message"])
 
     time.sleep(c.TickInterval)
 
