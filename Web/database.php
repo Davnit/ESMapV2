@@ -14,12 +14,20 @@
         
         $values = array();
         $rows = array();
-
+        
         // Build a row for each element of the data
-        foreach ($data as $d)
+        if (count($fields) > 1)
         {
-            $rows[] = "(" . implode(",", array_fill(0, sizeof($d), "?")) . ")";     // Values with ? placeholder
-            $values = array_merge($values, array_values($d));            
+            foreach ($data as $d)
+            {
+                $rows[] = "(" . implode(",", array_fill(0, sizeof($d), "?")) . ")";     // Values with ? placeholder
+                $values = array_merge($values, array_values($d));            
+            }
+        }
+        else
+        {
+            $rows = array_fill(0, count($data), "(?)");
+            $values = array_values($data);
         }
         
         $sql = sprintf("INSERT INTO %s (%s) VALUES %s", $table, implode(",", $fields), implode(",", $rows));
