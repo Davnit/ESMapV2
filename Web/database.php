@@ -4,7 +4,7 @@
     
     $dsn = "mysql:host=" . $config["db_host"] . ";dbname=" . $config["db_name"];
     $db = new PDO($dsn, $config["db_user"], $config["db_pass"]);
-    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
+    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     
     function insertRows($table, $fields, $data, $ignoreDuplicates = false)
     {
