@@ -35,11 +35,20 @@ for idx in range(1, len(calls)):
         elif desc == "HOUSE/BUSINESS CHECK":
             call_type = "Patrol"
             
+        # Determine location string to geocode
+        location = meta["location"]
+        if location == "100 S HUGHEY AV":
+            location = ""
+        else:
+            if " / " in location:
+                location = location.replace(" / ", " AND ")
+        
+        row_data["location"] = location
         row_data["category"] = call_type
         row_data["key"] = "OPD-" + meta["call_number"]
-            
-        # Add call to list
         row_data["meta"] = meta
+        
+        # Add call to list
         results.append(row_data)
     except Exception:
         pass

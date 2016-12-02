@@ -123,6 +123,7 @@ def check(source):
         c.source = source
         c.key = r["key"]
         c.category = r["category"]
+        c.location = r["location"]
 
         calls.append(c)
 

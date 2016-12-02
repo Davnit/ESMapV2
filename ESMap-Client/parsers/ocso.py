@@ -40,13 +40,24 @@ for idx in range(1, len(calls)):
         elif ("TRAFFIC" in desc) or (desc == "VEHICLE ACCIDENT") or (desc == "OBSTRUCT ON HWY"):
             call_type = "Traffic"
         elif ("PATROL" in desc) or (desc == "HOUSE/BUS./AREA/CHECK"):
-            call_type = "Patrol"
-            
+            call_type = "Patrol"    
+        
+        # Determine location string to geocode
+        location = meta["location"].strip()
+        if location.startswith("["):
+            if location.startswith("[UNK]"):
+                location = location[5:].strip()
+            elif " - " in location and "] " in location:
+                location = location.split(" - ")[0][1:] + location.split("]")[1]
+        else:
+            location = location.replace("/", " AND ")
+        
+        row_data["location"] = location.strip()
         row_data["category"] = call_type
-     
-        # Add call to list
         row_data["meta"] = meta
+        
+        # Add call to list
         results.append(row_data)
-    except Exception:
-        pass
+    except Exception as ex:
+        raise ex
         

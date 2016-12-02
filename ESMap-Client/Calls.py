@@ -37,6 +37,7 @@ class CallData():
 
         self.category = None    # The type of call (Police, Fire, EMS, etc)
         self.source = None      # The CallSource object representing the source of the call
+        self.location = None    # The parsed location used for geocoding
 
     # Returns a short string identifying the call
     #   Example: Burglary @ 123 Main St
@@ -65,7 +66,7 @@ class CallData():
 
     # Returns a dictionary with values representing known call data
     def getReportData(self):
-        return { "key": self.key, "category": self.category, "meta": self.meta }
+        return { "key": self.key, "category": self.category, "location": self.location, "meta": self.meta }
 
 
 

@@ -36,6 +36,7 @@ class SourceUpdateReport():
                 if status["added"] != len(self.added): match = False
                 if status["expired"] != len(self.expired): match = False
 
+                # Did the server accept all of the changes?
                 if not match:
                     msg = "Reporting mismatch. Server added {0} rows, expired {1}."
                     print(msg.format(status["added"], status["expired"]))
@@ -64,4 +65,36 @@ class SourceUpdateReport():
             print("\tEXPIRED:")
             for c in self.expired.values():
                 print("\t\t", c.getShortDisplayString())
+
+
+class GeocodeReport():
+    def __init__(self, requests):
+        self.requests = requests
+
+    # Returns a dictionary of ID -> Geocode Results for the requests contained in this report
+    def getData(self):
+        return { r.id: r.results for r in self.requests }
+
+    def sendReport(self, url):
+        data = { "geodata": json.dumps(self.getData(), separators=(',',':')) }
+
+        ok, response = WebClient.postData(url, data)
+        if ok:
+            data = json.loads(response)
+            status = data["status"]
+
+            if status["success"]:
+                match = True
+                if status["resolved"] != len(self.requests): match = False
+
+                if not match:
+                    print("Reporting mismatch. Server resolved {0} locations.".format(status["resolved"]))
+                else:
+                    return True
+            else:
+                print("Report failed. Reason:", status["message"])
+        else:
+            print("Report submission failed. Reason:", str(response))
+
+        return False
         

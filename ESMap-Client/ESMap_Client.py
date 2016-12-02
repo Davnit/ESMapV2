@@ -1,10 +1,11 @@
 
 import time, sys, json
-import ClientConfig, Sources, Calls, WebClient, Reporting
+import ClientConfig, Sources, Calls, WebClient, Reporting, Geocoder
 
 # Startup
 print("Loading config...")
 c = ClientConfig.load()
+ClientConfig.save(c)        # This writes default values of new settings
 
 print("Obtaining sources...")
 sources = None
@@ -44,6 +45,8 @@ if c.UseRemoteServer and len(c.SyncUrl) > 0:
 
 # Run
 while True:
+    shouldGeocode = False       # Determines if we should get geocode requests this cycle
+
     # Iterate the data sources and check the ones that need updating
     for src in sources.values():
         if Sources.needsUpdate(src) and Sources.canCheck(src):
@@ -62,8 +65,24 @@ while True:
 
                     # Update the server with new data
                     if c.UseRemoteServer and len(c.IngestUrl) > 0:
-                        report.sendChangeReport(c.IngestUrl)
+                        report_ok = report.sendChangeReport(c.IngestUrl)
 
+                        # Check if we need to get geocode requests
+                        if Geocoder.canHandleRequests(c) and report_ok and len(report.added) > 0:
+                            shouldGeocode = True                        
+
+    # Handle geocode requests
+    if Geocoder.canHandleRequests(c) and shouldGeocode:
+        requests = Geocoder.getRequests(c.GeocodeRequestUrl)
+
+        # Resolve all of the requests
+        for request in requests:
+            if request.tryResolve(c.GeoApiUrl, c.GeoApiKey):
+                print("Geocode resolved: {0} -> {1}".format(request.location, request.getFormattedAddress()))
+
+        # Report the results
+        report = Reporting.GeocodeReport(requests)
+        report.sendReport(c.IngestUrl)
 
     time.sleep(c.TickInterval)
 
