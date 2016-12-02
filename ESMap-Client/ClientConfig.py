@@ -46,7 +46,7 @@ def save(c, configPath=None):
 class Config():
     def __init__(self, p):
         self.TickInterval = int(p.get("MAIN", "tick_interval", fallback="60"))      # Time to wait between checking if sources need to be updated
-        self.UseRemoteServer = bool(p.get("MAIN", "use_remote", fallback=False))    # Should the client sync with a remote server?
+        self.UseRemoteServer = bool(p.get("MAIN", "use_remote", fallback="False"))  # Should the client sync with a remote server?
       
         self.SourceLocation = p.get("PATHS", "sources", fallback="sources.txt")     # Location to obtain sources from
         self.IngestUrl = p.get("PATHS", "ingest", fallback="")                      # URL to report call list changes to
