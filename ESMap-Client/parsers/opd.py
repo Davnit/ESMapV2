@@ -24,6 +24,8 @@ for idx in range(1, len(calls)):
         meta["district"]        = getValue(call, "DISTRICT")
         meta["description"]     = getValue(call, "DESC")
         
+        meta["description"] = meta["description"].replace("&amp;", "&")
+        
         # Interpret call type from description
         call_type = "Police"
         desc = meta["description"].upper()
