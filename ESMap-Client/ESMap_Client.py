@@ -68,7 +68,7 @@ while True:
                         report_ok = report.sendChangeReport(c.IngestUrl)
 
                         # Check if we need to get geocode requests
-                        if Geocoder.canHandleRequests(c) and report_ok and len(report.added) > 0:
+                        if report_ok and len(report.added) > 0:
                             shouldGeocode = True                        
 
     # Handle geocode requests
