@@ -27,6 +27,7 @@ class GeocodeRequest():
         self.location = location    # The location to be geocoded
         self.resolved = False       # True if the request has been resolved
         self.results = None         # JSON data returned by the geocode API
+        self.filter = None          # Component filtering information
 
     # Attempts to resolve the request
     def tryResolve(self, apiUrl, clientKey = None):
@@ -35,6 +36,15 @@ class GeocodeRequest():
         params = { "address": self.location }
         if clientKey is not None:
             params["key"] = clientKey
+
+        # Convert filter to piped list
+        #  key1:v1|key1:v2|key1:v3|key2:v1|key2:v2|etc
+        comp = ""
+        for k, v in self.filter.items():
+            for item in v:
+                comp += k + ":" + item + "|"
+        if len(comp) > 0:
+            params["components"] = comp[:-1]
 
         # Make the request
         ok, response = WebClient.openUrl(apiUrl, params)
