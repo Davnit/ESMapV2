@@ -22,3 +22,14 @@ CREATE TABLE `sources` (
   `interval` int(11) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `geocodes`;
+CREATE TABLE `geocodes` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `location` varchar(100) NOT NULL,
+  `added` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `resolved` timestamp NULL DEFAULT NULL,
+  `results` text,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `location` (`location`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
