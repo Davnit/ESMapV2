@@ -27,6 +27,8 @@ DROP TABLE IF EXISTS `geocodes`;
 CREATE TABLE `geocodes` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `location` varchar(100) NOT NULL,
+  `latitude` decimal(8,6) DEFAULT NULL,
+  `longitude` float(9,6) DEFAULT NULL,
   `added` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `resolved` timestamp NULL DEFAULT NULL,
   `results` text,

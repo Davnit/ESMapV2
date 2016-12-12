@@ -92,9 +92,37 @@
     {
         $updateCount = 0;
         foreach ($data as $k => $v)
-        {
+        {           
+            $coords = null;     // Will hold an array containing latitude and logitude of the resolved point
+            
+            // Process the results
+            if (array_key_exists("results", $v))
+            {
+                $results = $v["results"];
+                if (count($results) > 0)
+                {
+                    // Check if geocode was resolved to a single point
+                    //  location_type == ROOFTOP or types is [street_address or intersection]
+                    $validTypes = array("street_addresss", "intersection");
+                    
+                    if ($results[0]["geometry"]["location_type"] == "ROOFTOP" or 
+                        count(array_intersect($results[0]["types"], $validTypes)) > 0)
+                        {
+                            $location = $results[0]["geometry"]["location"];
+                            $coords = array($location["lat"], $location["lng"]);
+                        }
+                }
+            }
+            
             // Update the results for this ID
-            $sql = "UPDATE geocodes SET resolved = NOW(), results = :results WHERE id = :geoID";
+            $sql = "UPDATE geocodes SET resolved = NOW(), results = :results";
+            if ($coords != null)
+            {
+                $sql .= ", latitude = " . floatval($coords[0]);
+                $sql .= ", longitude = " . floatval($coords[1]);
+            }
+            
+            $sql .= " WHERE id = :geoID";
             $statement = $db->prepare($sql);
             $statement->bindParam(":results", json_encode($v), PDO::PARAM_STR);
             $statement->bindParam(":geoID", $k, PDO::PARAM_INT);
