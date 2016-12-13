@@ -106,7 +106,7 @@
                 {
                     // Check if geocode was resolved to a single point
                     //  location_type == ROOFTOP or types is [street_address or intersection]
-                    $validTypes = array("street_addresss", "intersection");
+                    $validTypes = array("street_address", "intersection");
                     
                     if ($results[0]["geometry"]["location_type"] == "ROOFTOP" or 
                         count(array_intersect($results[0]["types"], $validTypes)) > 0)
