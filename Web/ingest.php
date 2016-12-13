@@ -50,24 +50,27 @@
             }
         
             // Add new locations to geocode table
-            insertRows("geocodes", [ "location" ], $locations, true);
-        
-            // Get geocode IDs for new calls
-            $sql = "SELECT id, location FROM geocodes WHERE location IN (%s)";
-            $sql = sprintf($sql, implode(",", array_fill(0, count($locations), "?")));
-            $statement = $db->prepare($sql);
-            $statement->execute(array_values($locations));
-        
-            $geocodes = $statement->fetchAll();
-            if (count($geocodes) > 0)
+            if (count($locations) > 0)
             {
-                // location -> geoid
-                $geocodes = array_column($geocodes, "id", "location");
-            
-                // Add geoid to calls
-                foreach ($locations as $k => $v)
+                insertRows("geocodes", [ "location" ], $locations, true);
+        
+                // Get geocode IDs for new calls
+                $sql = "SELECT id, location FROM geocodes WHERE location IN (%s)";
+                $sql = sprintf($sql, implode(",", array_fill(0, count($locations), "?")));
+                $statement = $db->prepare($sql);
+                $statement->execute(array_values($locations));
+        
+                $geocodes = $statement->fetchAll();
+                if (count($geocodes) > 0)
                 {
-                    $calls[$k][3] = $geocodes[$v];
+                    // location -> geoid
+                    $geocodes = array_column($geocodes, "id", "location");
+            
+                    // Add geoid to calls
+                    foreach ($locations as $k => $v)
+                    {
+                        $calls[$k][3] = $geocodes[$v];
+                    }
                 }
             }
         
