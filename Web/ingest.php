@@ -141,5 +141,12 @@
     }
     
     echo json_encode($response);
+    
+    // If changes were made to the dataset, update the current call list.
+    $status = $response["status"];
+    if (($status["added"] > 0) or ($status["expired"] > 0) or ($status["resolved"] > 0))
+    {
+        include "generate.php";
+    }
 
 ?>
