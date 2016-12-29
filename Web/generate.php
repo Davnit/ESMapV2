@@ -11,40 +11,32 @@
         return $statement->fetchAll(PDO::FETCH_ASSOC);
     }
     
-    // Get source metadata
-    $sources = getData("SELECT id, tag FROM sources");
-    
     // Get list of active or recently expired calls.
-    $sql = "SELECT c.id, c.source, c.category, c.meta, c.added, c.expired, g.latitude, g.longitude FROM calls c ";
+    $sql = "SELECT c.meta, g.latitude, g.longitude FROM calls c ";
     $sql .= "LEFT JOIN geocodes g ON g.id = c.geoid ";
-    $sql .= "WHERE c.expired IS NULL OR (c.expired >= NOW() - INTERVAL 1 HOUR)";
+    $sql .= "WHERE c.expired IS NULL OR (c.expired >= NOW() - INTERVAL 1 HOUR)";    
+    $callList = getData($sql);
     
-    $calls = getData($sql);
-    
-    // Set values to correct data types
-    for ($i = 0; $i < count($sources); $i++)
+    $calls = array();
+    foreach ($callList as $cL)
     {
-        $sources[$i]["id"] = intval($sources[$i]["id"]);
-    }
-    
-    for ($i = 0; $i < count($calls); $i++)
-    {
-        $call = $calls[$i];
+        $meta = json_decode($cL["meta"]);
+        $call["desc"] = sprintf("%s @ %s", $meta->description, $meta->location);
         
-        $calls[$i]["id"] = intval($call["id"]);
-        $calls[$i]["source"] = intval($call["source"]);
-        $calls[$i]["meta"] = json_decode($call["meta"]);
-        
-        if ($call["latitude"] != null) $calls[$i]["latitude"] = floatval($call["latitude"]);
-        if ($call["longitude"] != null) $calls[$i]["longitude"] = floatval($call["longitude"]);
+        // Only show calls that have resolved coordinates
+        if (($cL["latitude"] != null) and ($cL["longitude"] != null))
+        {
+            $call["lat"] = floatval($cL["latitude"]);
+            $call["lng"] = floatval($cL["longitude"]);
+            $calls[] = $call;
+        }
     }
-    
     
     $obj = array(
-        "sources" => $sources,
+        "updated" => time(),
         "calls" => $calls
     );
     
-    file_put_contents("current.json", json_encode($obj, JSON_PRETTY_PRINT));
+    file_put_contents("livemap.json", json_encode($obj, JSON_PRETTY_PRINT));
 
 ?>

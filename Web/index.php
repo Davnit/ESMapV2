@@ -4,30 +4,40 @@
         <script type="text/javascript" src="https://www.google.com/jsapi"></script>
         <script type="text/javascript">
             google.load("visualization", "1", { packages: [ "map" ] });
-            google.setOnLoadCallback(populateMap);
+            google.setOnLoadCallback(startup);
+            
+            var lastUpdate = null;
+            
+            function startup() {
+                populateMap();
+                setInterval(populateMap, 60000);
+            }
             
             function populateMap() {
-                $.get("current.json").done(function(obj) {
-                    var data = [
-                        [ "Latitude", "Longitude", "Description" ]
-                    ];
-                    
-                    for (i = 0; i < obj.calls.length; i++) {
-                        item = obj.calls[i];
-                        if (item.latitude != null && item.longitude != null) {
-                            data.push([ item.latitude, item.longitude, item.meta.description + " @ " + item.meta.location ]);
+                $.get("livemap.json").done(function(obj) {
+                    var updateTime = new Date(obj.updated);
+                    if (lastUpdate == null || updateTime > lastUpdate) {
+                        lastUpdate = updateTime;
+                        
+                        var data = [
+                            [ "Latitude", "Longitude", "Description" ]
+                        ];
+                        
+                        for (i = 0; i < obj.calls.length; i++) {
+                            item = obj.calls[i];
+                            data.push([ item.lat, item.lng, item.desc ]);
                         }
+                    
+                        var options = {
+                            showTip: true, 
+                            enableScrollWheel: true, 
+                            mapType: "normal",
+                            useMapTypeControl: true
+                        };
+                        
+                        var map = new google.visualization.Map(document.getElementById("map"));
+                        map.draw(google.visualization.arrayToDataTable(data), options);
                     }
-                    
-                    var options = {
-                        showTip: true, 
-                        enableScrollWheel: true, 
-                        mapType: "normal",
-                        useMapTypeControl: true
-                    };
-                    
-                    var map = new google.visualization.Map(document.getElementById("map"));
-                    map.draw(google.visualization.arrayToDataTable(data), options);
                 });
             }
         </script>
