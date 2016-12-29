@@ -3,7 +3,7 @@
     require_once "database.php";
     
     // Get a list of geocodes that have not been resolved.
-    $statement = $db->prepare("SELECT id, location FROM geocodes WHERE resolved IS NULL LIMIT 10");
+    $statement = $db->prepare("SELECT id, location FROM geocodes WHERE resolved IS NULL");
     $statement->execute();
     $geoList = $statement->fetchAll();
          
