@@ -12,6 +12,12 @@ def getRequests(sourceUrl):
     
     # Parse the response data into a list of requests
     data = json.loads(response)
+
+    # Check if values were returned
+    if not isinstance(data["geocodes"], dict):
+        return requests
+
+    # Parse the returned values
     for id, location in data["geocodes"].items():
         requests.append(GeocodeRequest(id, location))
     return requests
