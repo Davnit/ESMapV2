@@ -19,7 +19,9 @@ def getRequests(sourceUrl):
 
     # Parse the returned values
     for id, location in data["geocodes"].items():
-        requests.append(GeocodeRequest(id, location))
+        req = GeocodeRequest(id, location)
+        req.filter = { "country": [ "US" ], "administrative_area": [ "Florida", "Orange County" ] }
+        requests.append(req)
     return requests
 
 # Returns true if the specified config should handle geocode requests
