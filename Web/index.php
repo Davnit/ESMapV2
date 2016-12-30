@@ -3,12 +3,15 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
         <script type="text/javascript" src="https://www.google.com/jsapi"></script>
         <script type="text/javascript">
+            var lastUpdate = null;
+            var map = null;
+            
             google.load("visualization", "1", { packages: [ "map" ] });
             google.setOnLoadCallback(startup);
             
-            var lastUpdate = null;
-            
             function startup() {
+                map = new google.visualization.Map(document.getElementById("map"));
+                
                 populateMap();
                 setInterval(populateMap, 60000);
             }
@@ -16,6 +19,7 @@
             function populateMap() {
                 $.get("livemap.json").done(function(obj) {
                     var updateTime = new Date(obj.updated);
+                    
                     if (lastUpdate == null || updateTime > lastUpdate) {
                         lastUpdate = updateTime;
                         
@@ -35,7 +39,6 @@
                             useMapTypeControl: true
                         };
                         
-                        var map = new google.visualization.Map(document.getElementById("map"));
                         map.draw(google.visualization.arrayToDataTable(data), options);
                     }
                 });
