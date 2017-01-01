@@ -2,15 +2,6 @@
 
     require_once "database.php";
     
-    function getData($sql)
-    {
-        global $db;
-        $statement = $db->prepare($sql);
-        $statement->execute();
-        
-        return $statement->fetchAll(PDO::FETCH_ASSOC);
-    }
-    
     // Get a list of sources
     $sourceList = getData("SELECT id, tag FROM sources");
     

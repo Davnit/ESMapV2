@@ -6,6 +6,16 @@
     $db = new PDO($dsn, $config["db_user"], $config["db_pass"]);
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     
+    function getData($sql)
+    {
+        global $db;
+    
+        $statement = $db->prepare($sql);
+        $statement->execute();
+        
+        return $statement->fetchAll(PDO::FETCH_ASSOC);
+    }
+    
     function insertRows($table, $fields, $data, $ignoreDuplicates = false)
     {
         global $db;
