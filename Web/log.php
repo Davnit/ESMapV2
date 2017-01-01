@@ -43,15 +43,8 @@
             }
         </script>
         
+        <link rel="stylesheet" href="css/main.css">
         <style type="text/css">
-            #content {
-                position: absolute;
-                top: 0;
-                bottom: 0;
-                left: 0;
-                width: 100%;
-            }
-            
             #table {
                 height: 100%;
             }
