@@ -53,7 +53,7 @@
         "updated" => time(),
         "calls" => $mapCalls
     );
-    file_put_contents("livemap.json", json_encode($obj, JSON_PRETTY_PRINT));
+    file_put_contents("data/livemap.json", json_encode($obj, JSON_PRETTY_PRINT));
     
     // Create the object for the call list and serialize it.
     $obj = array(
@@ -61,6 +61,6 @@
         "sources" => $sources,
         "calls" => $tableCalls
     );
-    file_put_contents("call_log.json", json_encode($obj, JSON_PRETTY_PRINT));
+    file_put_contents("data/call_log.json", json_encode($obj, JSON_PRETTY_PRINT));
 
 ?>

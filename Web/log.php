@@ -17,7 +17,7 @@
             }
             
             function populateTable() {
-                $.get("call_log.json").done(function(obj) {
+                $.get("data/call_log.json").done(function(obj) {
                     var updateTime = new Date(obj.updated);
 
                     if (lastUpdate == null || updateTime > lastUpdate) {
