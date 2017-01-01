@@ -54,6 +54,8 @@
     </head>
     
     <body>
+<?php include "header.php"; ?>
+
         <div id="content">
             <div id="table"></div>
         </div>

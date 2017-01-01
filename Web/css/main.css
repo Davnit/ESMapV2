@@ -1,3 +1,46 @@
+html {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    height: 100%;
+}
+
+#header {
+    background-color: #143253;
+}
+
+#header h1 {
+    margin: 0;
+    padding: 14px;
+    color: white;
+}
+
+#menu ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #B77700;
+}
+
+#menu li {
+    float: left;
+}
+
+#menu li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+#menu li a:hover {
+    background-color: #D2B070;
+}
+
 #content {
     height: 100%;
     width: 100%;

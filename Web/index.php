@@ -56,6 +56,8 @@
     </head>
     
     <body>
+<?php include "header.php"; ?>
+
         <div id="content">
             <div id="map"></div>
         </div>
