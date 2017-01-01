@@ -32,11 +32,10 @@ def save(c, configPath=None):
     p.add_section("PATHS")
     p.set("PATHS", "sources", c.SourceLocation)
     p.set("PATHS", "ingest", c.IngestUrl)
-    p.set("PATHS", "sync", c.SyncUrl)
+    p.set("PATHS", "data", c.DataUrl)
 
     p.add_section("GEOCODES")
     p.set("GEOCODES", "enabled", str(c.EnableGeocodes))
-    p.set("GEOCODES", "url", c.GeocodeRequestUrl)
     p.set("GEOCODES", "api", c.GeoApiUrl)
     p.set("GEOCODES", "api_key", c.GeoApiKey)
 
@@ -48,12 +47,11 @@ class Config():
         self.TickInterval = int(p.get("MAIN", "tick_interval", fallback="60"))      # Time to wait between checking if sources need to be updated
         self.UseRemoteServer = bool(p.get("MAIN", "use_remote", fallback="False"))  # Should the client sync with a remote server?
       
-        self.SourceLocation = p.get("PATHS", "sources", fallback="sources.txt")     # Location to obtain sources from
-        self.IngestUrl = p.get("PATHS", "ingest", fallback="")                      # URL to report call list changes to
-        self.SyncUrl = p.get("PATHS", "sync", fallback="")                          # URL to get a list of active calls
+        self.SourceLocation = p.get("PATHS", "sources", fallback="sources.txt")     # Location to obtain sources from (local only, otherwise DataUrl is used)
+        self.IngestUrl = p.get("PATHS", "ingest", fallback="")                      # URL to report new data to
+        self.DataUrl = p.get("PATHS", "data", fallback="")                          # URL to retrieve data from
 
         self.EnableGeocodes = bool(p.get("GEOCODES", "enabled", fallback="False"))  # Should the client process geocode requests
-        self.GeocodeRequestUrl = p.get("GEOCODES", "url", fallback="")              # URL to retrieve geocode requests
         self.GeoApiUrl = p.get("GEOCODES", "api", fallback=googleGeocodeAPI)        # API used to process geocode requests
         self.GeoApiKey = p.get("GEOCODES", "api_key", fallback="")                  # Client key assigned by the geocode API
 

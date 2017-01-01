@@ -38,7 +38,7 @@ def getRemoteSources(sourceUrl):
     sources = { }
 
     # Request sources from remote server
-    ok, response = WebClient.openUrl(sourceUrl)
+    ok, response = WebClient.openUrl(sourceUrl, { "request": 1 })
     if ok and not response.startswith("FAIL"):
         data = response.split("\r\n")
 

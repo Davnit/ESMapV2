@@ -10,7 +10,7 @@ ClientConfig.save(c)        # This writes default values of new settings
 print("Obtaining sources...")
 sources = None
 if c.UseRemoteServer:
-    sources = Sources.getRemoteSources(c.SourceLocation)
+    sources = Sources.getRemoteSources(c.DataUrl)
 else:
     sources = Sources.getLocalSources(c.SourceLocation)
 
@@ -25,10 +25,10 @@ for src in sources.values():
     active_calls[src.id] = [ ]
 
 # Sync
-if c.UseRemoteServer and len(c.SyncUrl) > 0:
-    print("Syncing with server: {0}".format(c.SyncUrl.split("://")[1].split("/")[0]))
+if c.UseRemoteServer and len(c.DataUrl) > 0:
+    print("Syncing with server: {0}".format(c.DataUrl.split("://")[1].split("/")[0]))
 
-    ok, response = WebClient.openUrl(c.SyncUrl)
+    ok, response = WebClient.openUrl(c.DataUrl, { "request": 2 })
     if ok:
         if response.startswith("FAIL"):
             print("\t... " + response)
@@ -73,7 +73,7 @@ while True:
 
     # Handle geocode requests
     if Geocoder.canHandleRequests(c) and shouldGeocode:
-        requests = Geocoder.getRequests(c.GeocodeRequestUrl)
+        requests = Geocoder.getRequests(c.DataUrl)
 
         # Resolve all of the requests
         for request in requests:

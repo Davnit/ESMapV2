@@ -6,7 +6,7 @@ import WebClient
 def getRequests(sourceUrl):
     requests = [ ]
 
-    ok, response = WebClient.openUrl(sourceUrl)
+    ok, response = WebClient.openUrl(sourceUrl, { "request": 3 })
     if not ok:
         return requests     # Return no requests
     
@@ -26,7 +26,7 @@ def getRequests(sourceUrl):
 
 # Returns true if the specified config should handle geocode requests
 def canHandleRequests(config):
-    return config.EnableGeocodes and len(config.GeocodeRequestUrl) > 0 and len(config.GeoApiUrl) > 0
+    return config.EnableGeocodes and len(config.DataUrl) > 0 and len(config.GeoApiUrl) > 0
 
 
 class GeocodeRequest():
