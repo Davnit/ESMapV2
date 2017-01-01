@@ -5,10 +5,13 @@ html {
 body {
     margin: 0;
     height: 100%;
+    width: 100%;
+    display: table;
 }
 
 #header {
     background-color: #143253;
+    display: table-row;
 }
 
 #header h1 {
@@ -44,4 +47,5 @@ body {
 #content {
     height: 100%;
     width: 100%;
+    display: table-row;
 }
