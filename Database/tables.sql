@@ -6,6 +6,7 @@ CREATE TABLE `calls` (
   `cid` varchar(40) NOT NULL,
   `category` varchar(15) DEFAULT NULL,
   `added` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `geoid` int(11) DEFAULT NULL,
   `expired` timestamp NULL DEFAULT NULL,
   `meta` text NOT NULL,
   PRIMARY KEY (`id`),
