@@ -52,13 +52,15 @@ for idx in range(2, len(rows)):
             locStr = tdsplit(r, "STREET_NO") + " " + locStr
         meta["location"] = locStr
         
-        category = "Fire"
-        if meta["call_type"].upper() != "FIRE":
-            category = meta["call_type"]
+        ct = meta["call_type"].upper()
+        if ct in [ "FIRE", "EMS", "TRAFFIC" ]:
+            ct = ct.title()
+        else:
+            ct = "General"
             
         row_data["key"] = "OCFR-" + meta["call_number"]
         row_data["location"] = locStr.replace("/", " AND ")
-        row_data["category"] = category
+        row_data["category"] = ct
         row_data["meta"] = meta
 
         geo = r.split("MAPBUTTON")[1].split("latlng=")[1].split("\">")[0].split(",")
