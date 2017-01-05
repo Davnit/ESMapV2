@@ -50,11 +50,17 @@ for idx in range(1, len(infoList)):
         # Make a rough parse of the location string
         #   This source is pretty good about providing its own geocodes but this is just in case.
         loc = meta["location"]
+        
+        # Check for cross streets (usually always provided, even when it's a direct address)
         if (" x[" in loc):
             parts = loc.split(" x[")
             loc = parts[0] + " AND " + parts[1][:-1]
         else:
             loc = loc
+        
+        # If the first "word" is a number this is most likely a direct address
+        if loc.split()[0].isdigit():
+            loc = loc.split("[")[0]
             
         row_data["location"]  = loc
         row_data["category"]  = call_type
