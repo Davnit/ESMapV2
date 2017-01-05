@@ -22,6 +22,7 @@ CREATE TABLE `sources` (
   `parser` varchar(25) CHARACTER SET ascii NOT NULL,
   `update_time` int(11) NOT NULL,
   `bounds` varchar(45) CHARACTER SET ascii DEFAULT NULL,
+  `time_zone` varchar(30) CHARACTER SET ascii DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 

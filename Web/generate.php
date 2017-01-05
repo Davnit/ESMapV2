@@ -2,14 +2,31 @@
 
     require_once "database.php";
     
+    function convertTimeZone($time, $zone)
+    {
+        $dt = new DateTime($time, new DateTimeZone("Etc/UTC"));
+        $dt->setTimeZone(new DateTimeZone($zone));
+        return $dt->format("Y-m-d H:i:s");
+    }
+    
     // Get a list of sources
-    $sourceList = getData("SELECT id, tag, bounds FROM sources");
+    $sourceList = getData("SELECT id, tag, bounds, time_zone FROM sources");
     
     // Get a lookup of source ID -> tag
-    $tags = array_column($sourceList, "tag", "id");
+    $tags = 
     
-    // Get a lookup of source ID -> bounds[], where each element of the array is a lat or lng (ne_lat, ne_lng, sw_lat, sw_lng)
-    $bounds = array_map(function ($x) { return explode("|", str_replace(",", "|", $x)); }, array_column($sourceList, "bounds", "id"));    
+    // Make a multidimensional array of source data
+    $sources = array();
+    foreach ($sourceList as $sL)
+    {
+        $sources[$sL["id"]] = array(
+            "tag" => $sL["tag"],
+            "bounds" => explode("|", str_replace(",", "|", $sL["bounds"])),
+            "timezone" => $sL["time_zone"]
+        );
+    }
+    
+    #array_map(function ($x) { return explode("|", str_replace(",", "|", $x)); }, array_column($sourceList, "bounds", "id"));    
     
     // Get list of active or recently expired calls.
     $sql = "SELECT c.source, c.meta, c.added, c.expired, g.latitude, g.longitude FROM calls c ";
@@ -30,17 +47,21 @@
             $verified = true;
             
             // Check if the source of this call has a defined boundary
-            if (array_key_exists($src, $bounds))
+            if (array_key_exists($src, $sources))
             {
-                $bnd = $bounds[$src];
+                $bounds = $sources[$src]["bounds"];
                 
-                $fLat = floatval($cL["latitude"]);
-                $fLng = floatval($cL["longitude"]);
-                
-                // Check if the point is outside of the bounds
-                if ($fLat > $bnd[0] and $fLng > $bnd[1] and $fLat < $bnd[2] and $fLng < $bnd[3])
+                if (count($bounds) == 4)
                 {
-                    $verified = false;
+                    $fLat = floatval($cL["latitude"]);
+                    $fLng = floatval($cL["longitude"]);
+                    
+                    // Check if the point is outside of the bounds
+                    //   [ne_lat, ne_lng, sw_lat, sw_lng]
+                    if ($fLat > $bounds[0] and $fLng > $bounds[1] and $fLat < $bounds[2] and $fLng < $bounds[3])
+                    {
+                        $verified = false;
+                    }
                 }
             }
             
@@ -55,9 +76,21 @@
             }
         }
         
+        // Get call time information
+        $added = $cL["added"];
+        $expired = $cL["expired"];
+        $timezone = $sources[$src]["timezone"];
+        
+        // Convert times to the source's time zone
+        if ($timezone != null)
+        {
+            $added = convertTimeZone($added, $timezone);
+            $expired = convertTimeZone($expired, $timezone);
+        }
+        
         // Determine the call's start time. If the source specified a time, use that, otherwise
         //   use the time the call was added to the database.
-        $callTime = (strlen($meta->call_time) > 0) ? $meta->call_time : $cL["added"];
+        $callTime = (strlen($meta->call_time) > 0) ? $meta->call_time : $added;
         
         // The call log table contains slightly more information about every call.
         $tableCalls[] = array(
@@ -65,7 +98,7 @@
             "desc" => $meta->description,       # Call description
             "loc" => $meta->location,           # Unprocessed location of the call
             "time" => $callTime,                # The time the call was made or found
-            "closed" => $cL["expired"]          # The time the call was closed/expired (or null if its ongoing)
+            "closed" => $expired                # The time the call was closed/expired (or null if its ongoing)
         );
     }
     
@@ -79,7 +112,7 @@
     // Create the object for the call list and serialize it.
     $obj = array(
         "updated" => time(),
-        "sources" => $tags,
+        "sources" => array_column($sourceList, "tag", "id"),
         "calls" => $tableCalls
     );
     file_put_contents("data/call_log.json", json_encode($obj, JSON_PRETTY_PRINT));
