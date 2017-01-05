@@ -59,5 +59,5 @@ for idx in range(1, len(calls)):
         # Add call to list
         results.append(row_data)
     except Exception as ex:
-        raise ex
+        pass
         

@@ -73,7 +73,7 @@ if tableContainerId in data:
         
             results.append(row_data)
         except Exception as ex:
-            raise ex
+            pass
     
 
     

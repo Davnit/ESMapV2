@@ -62,7 +62,7 @@ for idx in range(1, len(infoList)):
         
         results.append(row_data)
     except Exception as ex:
-        raise ex
+        pass
 
 try:
     latcol = data.split("var Lat = ")[1].split("[")[1].split("];")[0].replace("\"", "").split(",")    
