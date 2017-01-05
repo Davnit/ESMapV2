@@ -24,7 +24,7 @@
             
             foreach ($data as $d)
             {
-                print(implode("|", [ $d["id"], $d["tag"], $d["url"], $d["parser"], $d["interval"] ]) . "\r\n");
+                print(implode("|", [ $d["id"], $d["tag"], $d["url"], $d["parser"], $d["update_time"] ]) . "\r\n");
             }
             break;
             
