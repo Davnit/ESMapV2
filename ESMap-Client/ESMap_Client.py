@@ -75,14 +75,15 @@ while True:
     if Geocoder.canHandleRequests(c) and shouldGeocode:
         requests = Geocoder.getRequests(c.DataUrl)
 
-        # Resolve all of the requests
-        for request in requests:
-            if request.tryResolve(c.GeoApiUrl, c.GeoApiKey):
-                print("Geocode resolved: {0} -> {1}".format(request.location, request.getFormattedAddress()))
+        if len(requests) > 0:
+            # Resolve all of the requests
+            for request in requests:
+                if request.tryResolve(c.GeoApiUrl, c.GeoApiKey):
+                    print("Geocode resolved: {0} -> {1}".format(request.location, request.getFormattedAddress()))
 
-        # Report the results
-        report = Reporting.GeocodeReport(requests)
-        report.sendReport(c.IngestUrl)
+            # Report the results
+            report = Reporting.GeocodeReport(requests)
+            report.sendReport(c.IngestUrl)
 
     time.sleep(c.TickInterval)
 
