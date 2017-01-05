@@ -21,6 +21,7 @@ CREATE TABLE `sources` (
   `url` varchar(255) CHARACTER SET ascii NOT NULL,
   `parser` varchar(25) CHARACTER SET ascii NOT NULL,
   `interval` int(11) NOT NULL,
+  `bounds` varchar(45) CHARACTER SET ascii NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
