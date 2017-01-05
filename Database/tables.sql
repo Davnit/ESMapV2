@@ -21,9 +21,10 @@ CREATE TABLE `sources` (
   `url` varchar(255) CHARACTER SET ascii NOT NULL,
   `parser` varchar(25) CHARACTER SET ascii NOT NULL,
   `update_time` int(11) NOT NULL,
-  `bounds` varchar(45) CHARACTER SET ascii NOT NULL,
+  `bounds` varchar(45) CHARACTER SET ascii DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
 
 DROP TABLE IF EXISTS `geocodes`;
 CREATE TABLE `geocodes` (
