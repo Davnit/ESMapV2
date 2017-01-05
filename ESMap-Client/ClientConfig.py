@@ -42,17 +42,21 @@ def save(c, configPath=None):
     with open(configPath, "w") as file:
         p.write(file)
 
+def parseBool(str):
+    return (str.lower() == "true") or (str == "1")
+
 class Config():
     def __init__(self, p):
-        self.TickInterval = int(p.get("MAIN", "tick_interval", fallback="60"))      # Time to wait between checking if sources need to be updated
-        self.UseRemoteServer = bool(p.get("MAIN", "use_remote", fallback="False"))  # Should the client sync with a remote server?
+        self.TickInterval = int(p.get("MAIN", "tick_interval", fallback="60"))           # Time to wait between checking if sources need to be updated
+        self.UseRemoteServer = parseBool(p.get("MAIN", "use_remote", fallback="False"))  # Should the client sync with a remote server?
       
-        self.SourceLocation = p.get("PATHS", "sources", fallback="sources.txt")     # Location to obtain sources from (local only, otherwise DataUrl is used)
-        self.IngestUrl = p.get("PATHS", "ingest", fallback="")                      # URL to report new data to
-        self.DataUrl = p.get("PATHS", "data", fallback="")                          # URL to retrieve data from
+        self.SourceLocation = p.get("PATHS", "sources", fallback="sources.txt")          # Location to obtain sources from (local only, otherwise DataUrl is used)
+        self.IngestUrl = p.get("PATHS", "ingest", fallback="")                           # URL to report new data to
+        self.DataUrl = p.get("PATHS", "data", fallback="")                               # URL to retrieve data from
 
-        self.EnableGeocodes = bool(p.get("GEOCODES", "enabled", fallback="False"))  # Should the client process geocode requests
-        self.GeoApiUrl = p.get("GEOCODES", "api", fallback=googleGeocodeAPI)        # API used to process geocode requests
-        self.GeoApiKey = p.get("GEOCODES", "api_key", fallback="")                  # Client key assigned by the geocode API
+        self.EnableGeocodes = parseBool(p.get("GEOCODES", "enabled", fallback="False"))  # Should the client process geocode requests
+        self.GeoApiUrl = p.get("GEOCODES", "api", fallback=googleGeocodeAPI)             # API used to process geocode requests
+        self.GeoApiKey = p.get("GEOCODES", "api_key", fallback="")                       # Client key assigned by the geocode API
+
 
 
