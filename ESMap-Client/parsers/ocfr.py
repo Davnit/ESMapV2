@@ -28,49 +28,52 @@ def verifyGeo(lat, lng):
         
     return True
     
-    
-# All call data is contained in an HTML table.
-table = data.split("lstvwCalls4Svc_itemPlaceholderContainer")[1].split("</table>")[0]
-    
-# Skip split[0] (pre-first row) and [1] (header row)
-rows = table.split("<tr")
-for idx in range(2, len(rows)):
-    try:
-        r = rows[idx].split("</tr>")[0].strip()
-    
-        row_data = { }
-    
-        meta = { }
-        meta["call_number"] = tdsplit(r, "CALL_NO")
-        meta["call_time"]   = tdsplit(r, "DISPATCH_TIME")
-        meta["description"] = tdsplit(r, "CALL_DESCRIPTION")
-        meta["call_type"]   = tdsplit(r, "CALL_TYPE")
-        meta["unit"]        = tdsplit(r, "UNITLabel")
-        
-        locStr = tdsplit(r, "STREET_NAME")
-        if not ("/" in locStr):
-            locStr = tdsplit(r, "STREET_NO") + " " + locStr
-        meta["location"] = locStr
-        
-        ct = meta["call_type"].upper()
-        if ct in [ "FIRE", "EMS", "TRAFFIC" ]:
-            ct = ct.title()
-        else:
-            ct = "General"
-            
-        row_data["key"] = "OCFR-" + meta["call_number"]
-        row_data["location"] = locStr.replace("/", " AND ")
-        row_data["category"] = ct
-        row_data["meta"] = meta
 
-        geo = r.split("MAPBUTTON")[1].split("latlng=")[1].split("\">")[0].split(",")
-        if verifyGeo(geo[0], geo[1]):
-            row_data["geo_lat"] = geo[0]
-            row_data["geo_lng"] = geo[1]
+tableContainerId = "lstvwCalls4Svc_itemPlaceholderContainer"
+
+# All call data is contained in an HTML table.
+if tableContainerId in data:
+    table = data.split(tableContainerId)[1].split("</table>")[0]
     
-        results.append(row_data)
-    except Exception as ex:
-        raise ex
+    # Skip split[0] (pre-first row) and [1] (header row)
+    rows = table.split("<tr")
+    for idx in range(2, len(rows)):
+        try:
+            r = rows[idx].split("</tr>")[0].strip()
+        
+            row_data = { }
+        
+            meta = { }
+            meta["call_number"] = tdsplit(r, "CALL_NO")
+            meta["call_time"]   = tdsplit(r, "DISPATCH_TIME")
+            meta["description"] = tdsplit(r, "CALL_DESCRIPTION")
+            meta["call_type"]   = tdsplit(r, "CALL_TYPE")
+            meta["unit"]        = tdsplit(r, "UNITLabel")
+            
+            locStr = tdsplit(r, "STREET_NAME")
+            if not ("/" in locStr):
+                locStr = tdsplit(r, "STREET_NO") + " " + locStr
+            meta["location"] = locStr
+            
+            ct = meta["call_type"].upper()
+            if ct in [ "FIRE", "EMS", "TRAFFIC" ]:
+                ct = ct.title()
+            else:
+                ct = "General"
+                
+            row_data["key"] = "OCFR-" + meta["call_number"]
+            row_data["location"] = locStr.replace("/", " AND ")
+            row_data["category"] = ct
+            row_data["meta"] = meta
+    
+            geo = r.split("MAPBUTTON")[1].split("latlng=")[1].split("\">")[0].split(",")
+            if verifyGeo(geo[0], geo[1]):
+                row_data["geo_lat"] = geo[0]
+                row_data["geo_lng"] = geo[1]
+        
+            results.append(row_data)
+        except Exception as ex:
+            raise ex
     
 
     
