@@ -38,7 +38,7 @@
             break;
             
         case 3:     # Geocode requests
-            $data = getData("SELECT id, location FROM geocodes WHERE resolved IS NULL");
+            $data = getData("SELECT id, location FROM geocodes WHERE results IS NULL AND latitude IS NULL AND longitude IS NULL");
             
             $geo = array();
             foreach ($data as $d)

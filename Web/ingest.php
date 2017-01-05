@@ -38,22 +38,34 @@
         if (count($data["new"]) > 0) 
         {
             $calls = array();       // New calls
-        
-            // Get a lookup of key -> location from the new call data
-            $locations = array_column($data["new"], "location", "key");
-            $locations = array_filter($locations, function($v) { return strlen($v) > 0; });
+            $locations = array();   // Locations of new calls
         
             // Format new call data as rows for the table
             foreach ($data["new"] as $row)
             {
                 $calls[$row["key"]] = [ $source, $row["key"], $row["category"], -1, json_encode($row["meta"]) ];
+                
+                // If this call has already been geocoded, use those coordinates.
+                if (strlen($row["location"]) > 0)
+                {
+                    $locItem = [ $row["location"], null, null ];
+                    if (array_key_exists("geo_lat", $row) and array_key_exists("geo_lng", $row))
+                    {
+                        $locItem[1] = $row["geo_lat"];
+                        $locItem[2] = $row["geo_lng"];
+                    }
+                    $locations[$row["key"]] = $locItem;
+                }
             }
         
             // Add new locations to geocode table
             if (count($locations) > 0)
             {
-                insertRows("geocodes", [ "location" ], $locations, true);
-        
+                insertRows("geocodes", [ "location", "latitude", "longitude" ], $locations, true);
+                
+                // Trim locations down to just the location string (no more coordinates)
+                $locations = array_map(function ($x) { return $x[0]; }, $locations);
+                
                 // Get geocode IDs for new calls
                 $sql = "SELECT id, location FROM geocodes WHERE location IN (%s)";
                 $sql = sprintf($sql, implode(",", array_fill(0, count($locations), "?")));

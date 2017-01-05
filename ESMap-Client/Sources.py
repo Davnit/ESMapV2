@@ -125,6 +125,10 @@ def check(source):
         c.category = r["category"]
         c.location = r["location"]
 
+        # Check for provided coordinates
+        if ("geo_lat" in r) and ("geo_lng" in r):
+            c.coords = [ r["geo_lat"], r["geo_lng"] ]
+
         calls.append(c)
 
     return calls
