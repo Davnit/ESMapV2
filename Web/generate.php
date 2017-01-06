@@ -4,6 +4,7 @@
     
     function convertTimeZone($time, $zone)
     {
+        if (strlen(trim($time)) == 0) return $time;
         $dt = new DateTime($time, new DateTimeZone("Etc/UTC"));
         $dt->setTimeZone(new DateTimeZone($zone));
         return $dt->format("Y-m-d H:i:s");
