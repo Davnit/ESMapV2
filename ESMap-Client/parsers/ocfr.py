@@ -56,8 +56,10 @@ if tableContainerId in data:
             meta["location"] = locStr
             
             ct = meta["call_type"].upper()
-            if ct in [ "FIRE", "EMS", "TRAFFIC" ]:
+            if ct in [ "FIRE", "TRAFFIC" ]:
                 ct = ct.title()
+            elif ct == "EMS":
+                ct = ct
             else:
                 ct = "General"
                 
