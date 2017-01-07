@@ -1,5 +1,7 @@
 <?php
 
+    require_once "lib/Locations.php";
+    
     function reportError($message)
     {
         $response = array(
@@ -45,15 +47,21 @@
             {
                 $calls[$row["key"]] = [ $source, $row["key"], $row["category"], -1, json_encode($row["meta"]) ];
                 
-                // If this call has already been geocoded, use those coordinates.
                 if (strlen($row["location"]) > 0)
                 {
-                    $locItem = [ $row["location"], null, null ];
+                    $procLoc = processLocation($row["location"]);
+                    if ($procLoc == false)
+                        continue;   # Location is indeterminate
+                        
+                    $locItem = [ $procLoc, null, null ];
+                    
+                    // If this call has already been geocoded, use those coordinates.
                     if (array_key_exists("geo_lat", $row) and array_key_exists("geo_lng", $row))
                     {
                         $locItem[1] = $row["geo_lat"];
                         $locItem[2] = $row["geo_lng"];
                     }
+                    
                     $locations[$row["key"]] = $locItem;
                 }
             }
