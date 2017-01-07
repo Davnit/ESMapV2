@@ -19,13 +19,8 @@ for idx in range(1, len(infoList)):
         meta = { }
         meta["call_number"]   = getRowValue(info, "Incident #")
         meta["dispatched"]    = getRowValue(info, "Dispatched")
-        meta["arrived"]       = getRowValue(info, "Arrived")
-            
+        meta["arrived"]       = getRowValue(info, "Arrived")    
         meta["call_date"]     = getRowValue(info, "Date")
-        if len(meta["dispatched"]) > 0:
-            meta["call_time"] = meta["call_date"] + " " + meta["dispatched"]
-        else:
-            meta["call_time"] = ""
             
         # FHP doesn't provide unique call numbers so we need to come up with our own
         cd = meta["call_date"].split("/")
