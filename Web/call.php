@@ -18,7 +18,7 @@
     
     $id = intval($id);
     
-    require_once "database.php";
+    require_once "lib/Database.php";
     
     $sql = "SELECT c.category, c.added, c.expired, c.meta, g.latitude, g.longitude, s.tag FROM calls c ";
     $sql .= "LEFT JOIN geocodes g on g.id = c.geoid ";

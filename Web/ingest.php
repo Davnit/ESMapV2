@@ -20,7 +20,7 @@
     }
     
     // Access the database
-    require_once "database.php";
+    require_once "lib/Database.php";
     
     // Default response
     $response = array(

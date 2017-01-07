@@ -13,7 +13,7 @@
         die("FAIL Bad request");
     }
     
-    require_once "database.php";
+    require_once "lib/Database.php";
     
     $request = intval($request);
     

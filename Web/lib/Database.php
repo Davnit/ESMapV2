@@ -1,6 +1,6 @@
 <?php
     
-    $config = require("config.php");
+    $config = require("Config.php");
     
     $dsn = "mysql:host=" . $config["db_host"] . ";dbname=" . $config["db_name"];
     $db = new PDO($dsn, $config["db_user"], $config["db_pass"]);

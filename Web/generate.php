@@ -1,6 +1,6 @@
 <?php
 
-    require_once "database.php";
+    require_once "lib/Database.php";
     
     function convertTimeZone($time, $zone)
     {
