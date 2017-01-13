@@ -6,12 +6,12 @@
     $db = new PDO($dsn, $config["db_user"], $config["db_pass"]);
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     
-    function getData($sql)
+    function getData($sql, $values = array())
     {
         global $db;
     
         $statement = $db->prepare($sql);
-        $statement->execute();
+        $statement->execute($values);
         
         return $statement->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -30,16 +30,18 @@
         {
             foreach ($data as $d)
             {
-                $rows[] = "(" . implode(",", array_fill(0, sizeof($d), "?")) . ")";     // Values with ? placeholder
-                $values = array_merge($values, array_values($d));            
+                $rows[] = "(" . implode(",", array_fill(0, sizeof($d), "?")) . ")";     # Value placeholders
+                $values = array_merge($values, array_values($d));                       # Value list
             }
         }
         else
         {
+            // Single value
             $rows = array_fill(0, count($data), "(?)");
             $values = array_values($data);
         }
         
+        // Build the query
         $sql = sprintf("INSERT INTO %s (%s) VALUES %s", $table, implode(",", $fields), implode(",", $rows));
         if ($ignoreDuplicates)
         {
