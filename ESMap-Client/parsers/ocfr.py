@@ -13,12 +13,12 @@ def verifyGeo(lat, lng):
     bounds = { "southwest": { "lat": 28.346725, "lng": -81.65859829999999 },
                "northeast": { "lat": 28.7860889, "lng": -80.870879 }}
     
+    # Check for default coordinates (these are specified in the source's own code)
+    if (lat == "28.539555") and (lng == "81.374692"):
+        return False
+        
     lat = float(lat)
     lng = float(lng)
-    
-    # Check for default coordinates (these are specified in the source's own code)
-    if (lat == 28.539555) and (lng == 81.374692):
-        return False
     
     # Check bounds
     if (lat < bounds["southwest"]["lat"]) or (lat > bounds["northeast"]["lat"]):
