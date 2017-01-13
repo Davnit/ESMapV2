@@ -16,6 +16,9 @@
             "BLVD" => array("BV", "BVD", "BOULEVARD"), "EXPRESSWAY" => array("EXP", "EXPY")
         );
         
+        $location = str_replace("/", " AND ", $location);
+        $location = str_replace("  ", " ", $location);
+        
         $returnLocation = array();
         
         $intersection = !(strpos($location, " AND ") == false);
