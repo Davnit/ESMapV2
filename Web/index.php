@@ -1,4 +1,8 @@
-<html>
+<?php
+
+    $config = require("lib/Config.php");
+    
+?><html>
     <head>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
         <script type="text/javascript" src="https://www.google.com/jsapi"></script>
@@ -13,7 +17,7 @@
                 map = new google.visualization.Map(document.getElementById("map"));
                 
                 populateMap();
-                setInterval(populateMap, 60000);
+                setInterval(populateMap, <?php echo (intval($config["page_refresh"]) * 1000); ?>);
             }
             
             function populateMap() {
