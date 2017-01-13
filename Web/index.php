@@ -28,19 +28,39 @@
                         lastUpdate = updateTime;
                         
                         var data = [
-                            [ "Latitude", "Longitude", "Description" ]
+                            [ "Latitude", "Longitude", "Description", "Marker" ]
                         ];
                         
                         for (i = 0; i < obj.calls.length; i++) {
                             item = obj.calls[i];
-                            data.push([ item.lat, item.lng, item.desc ]);
+                            data.push([ item.lat, item.lng, item.desc, item.category ]);
                         }
                     
+                        var iconBin = "<?php echo $config["icon_bin"]; ?>";
+                        
                         var options = {
                             showTip: true, 
                             enableScrollWheel: true, 
                             mapType: "normal",
-                            useMapTypeControl: true
+                            useMapTypeControl: true,
+                            
+                            icons: {
+                                General: {
+                                    normal: iconBin + "default.png",
+                                },
+                                Police: {
+                                    normal: iconBin + "Police.png",
+                                },
+                                Fire: {
+                                    normal: iconBin + "Fire.png",
+                                },
+                                EMS: {
+                                    normal: iconBin + "Help.png",
+                                },
+                                Traffic: {
+                                    normal: iconBin + "Traffic.png"
+                                }
+                            }
                         };
                         
                         map.draw(google.visualization.arrayToDataTable(data), options);

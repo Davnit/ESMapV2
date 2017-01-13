@@ -30,7 +30,7 @@
     #array_map(function ($x) { return explode("|", str_replace(",", "|", $x)); }, array_column($sourceList, "bounds", "id"));    
     
     // Get list of active or recently expired calls.
-    $sql = "SELECT c.source, c.meta, c.added, c.expired, g.latitude, g.longitude FROM calls c ";
+    $sql = "SELECT c.source, c.category, c.meta, c.added, c.expired, g.latitude, g.longitude FROM calls c ";
     $sql .= "LEFT JOIN geocodes g ON g.id = c.geoid ";
     $sql .= "WHERE c.expired IS NULL OR (c.expired >= NOW() - INTERVAL 1 HOUR)";    
     $callList = getData($sql);
@@ -47,6 +47,9 @@
         {
             $verified = true;
             
+            $fLat = floatval($cL["latitude"]);
+            $fLng = floatval($cL["longitude"]);
+            
             // Check if the source of this call has a defined boundary
             if (array_key_exists($src, $sources))
             {
@@ -54,9 +57,6 @@
                 
                 if (count($bounds) == 4)
                 {
-                    $fLat = floatval($cL["latitude"]);
-                    $fLng = floatval($cL["longitude"]);
-                    
                     // Check if the point is outside of the bounds
                     //   [ne_lat, ne_lng, sw_lat, sw_lng]
                     if ($fLat > $bounds[0] and $fLng > $bounds[1] and $fLat < $bounds[2] and $fLng < $bounds[3])
@@ -70,6 +70,7 @@
             {
                 // Add the point to the map list
                 $mapCalls[] = array(
+                    "category" => $cL["category"],
                     "desc" => sprintf("%s @ %s", $meta->description, $meta->location),
                     "lat" => $fLat, 
                     "lng" => $fLng

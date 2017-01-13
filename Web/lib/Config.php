@@ -6,7 +6,8 @@
         "db_user" => "esmap",
         "db_pass" => "",
         
-        "page_refresh" => 60
+        "page_refresh" => 60,
+        "icon_bin" => "icons/"
 );
 
 ?>
