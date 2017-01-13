@@ -1,6 +1,7 @@
 <?php
 
     require_once "lib/Database.php";
+    $config = require("lib/Config.php");
     
     function convertTimeZone($time, $zone)
     {
@@ -32,7 +33,7 @@
     // Get list of active or recently expired calls.
     $sql = "SELECT c.source, c.category, c.meta, c.added, c.expired, g.latitude, g.longitude FROM calls c ";
     $sql .= "LEFT JOIN geocodes g ON g.id = c.geoid ";
-    $sql .= "WHERE c.expired IS NULL OR (c.expired >= NOW() - INTERVAL 1 HOUR)";    
+    $sql .= "WHERE c.expired IS NULL OR (c.expired >= NOW() - INTERVAL " . $config["history_time"] . ")";    
     $callList = getData($sql);
     
     $mapCalls = array();
