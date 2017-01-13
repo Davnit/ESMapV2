@@ -45,26 +45,13 @@
             // Format new call data as rows for the table
             foreach ($data["new"] as $row)
             {
-                $calls[$row["key"]] = [ $source, $row["key"], $row["category"], -1, json_encode($row["meta"]) ];
+                $calls[$row["key"]] = [ $source, $row["key"], $row["category"], null, json_encode($row["meta"]) ];
                 
-                if (strlen($row["location"]) > 0)
-                {
-                    $procLoc = processLocation($row["location"]);
-                    if ($procLoc == false)
-                        continue;   # Location is indeterminate
-                        
-                    $locItem = [ $procLoc, null, null ];
-                    
-                    // If this call has already been geocoded, use those coordinates.
-                    if (array_key_exists("geo_lat", $row) and array_key_exists("geo_lng", $row))
-                    {
-                        $locItem[1] = $row["geo_lat"];
-                        $locItem[2] = $row["geo_lng"];
-                    }
-                    
-                    $locations[$row["key"]] = $locItem;
-                }
+                $locations[$row["key"]] = extractLocationData($row);
             }
+            
+            // Remove bad locations
+            $locations = array_filter($locations, function($x) { return is_array($x); });
         
             // Add new locations to geocode table
             if (count($locations) > 0)
@@ -72,15 +59,13 @@
                 insertRows("geocodes", [ "location", "latitude", "longitude" ], $locations, true);
                 
                 // Trim locations down to just the location string (no more coordinates)
-                $locations = array_map(function ($x) { return $x[0]; }, $locations);
+                $locations = array_map(function ($x) { return $x["location"]; }, $locations);
                 
                 // Get geocode IDs for new calls
                 $sql = "SELECT id, location FROM geocodes WHERE location IN (%s)";
                 $sql = sprintf($sql, implode(",", array_fill(0, count($locations), "?")));
-                $statement = $db->prepare($sql);
-                $statement->execute(array_values($locations));
         
-                $geocodes = $statement->fetchAll();
+                $geocodes = getData($sql, array_values($locations));
                 if (count($geocodes) > 0)
                 {
                     // location -> geoid
@@ -104,9 +89,121 @@
         {
             $expCount = updateTimestamps("calls", "expired", "cid", $data["expired"]);
         }
+        
+        // Handle data changes
+        if (count($data["updated"]) > 0)
+        {
+            // Get updated call IDs
+            $updateCIDs = array_keys($data["updated"]);
+            
+            // Get list of new locations
+            $newLocations = array();
+            foreach ($data["updated"] as $cid => $row)
+            {
+                $newLocations[$cid] = extractLocationData($row);
+            }
+            $newLocations = array_filter($newLocations, function($x) { return is_array($x); });
+            
+            if (count($newLocations) > 0)
+            {
+                // Try to insert new locations
+                insertRows("geocodes", [ "location", "latitude", "longitude" ], $newLocations, true);
+                $newLocations = array_map(function ($x) { return $x["location"]; }, $newLocations);
+                
+                // Retreive IDs for new locations
+                $sql = "SELECT id, location FROM geocodes WHERE location IN (%s)";
+                $sql = sprintf($sql, implode(",", array_fill(0, count($newLocations), "?")));
+                $geocodes = getData($sql, array_values($newLocations));
+                
+                $geocodes = array_column($geocodes, "id", "location");
+            }
+            
+            // Retrieve existing call data
+            $sql = "SELECT c.cid, c.category, c.geoid, g.location, c.meta FROM calls c ";
+            $sql .= "LEFT JOIN geocodes g ON c.geoid = g.id ";
+            $sql .= "WHERE c.cid IN (" . implode(",", array_fill(0, sizeof($updateCIDs), "?")) . ")";
+            
+            $current = getData($sql, $updateCIDs);
+            $current = array_column($current, null, "cid");     # index calls by ID
+            
+            $updCount = 0;
+            
+            // Iterate through all of the update data and compare to the current data
+            foreach ($data["updated"] as $cid => $updates)
+            {
+                if (is_array($updates) == false) continue;
+                
+                $updatedValues = array();
+                
+                // Call records do not store a location, but a reference to the location (GID)
+                if (array_key_exists("location", $updates))
+                {
+                    $newGID = $geocodes[$newLocations[$cid]];
+                    if ($newGID != $current[$cid]["geoid"])
+                        $updatedValues["geoid"] = $newGID;
+                }
+                
+                if (array_key_exists("category", $updates))
+                {
+                    if ($updates["category"] != $current[$cid]["category"])
+                        $updatedValues["category"] = $updates["category"];
+                }
+                
+                // Metadata update handling is a little more complex.
+                //   The stored JSON needs to be decoded and merged with the updated values.
+                if (array_key_exists("meta", $updates))
+                {
+                    $metaChanged = false;
+                    $currentMeta = json_decode($current[$cid]["meta"], true);
+                    
+                    // Iterate each value being changed
+                    foreach ($updates["meta"] as $key => $newValue)
+                    {
+                        if (array_key_exists($key, $currentMeta))
+                        {
+                            // Verify the new value is different
+                            if ($currentMeta[$key] != $newValue)
+                            {
+                                $metaChanged = true;
+                                $currentMeta[$key] = $newValue;     # Update value
+                            }
+                        }
+                    }
+                    
+                    if ($metaChanged)
+                        $updatedValues["meta"] = json_encode($currentMeta);
+                }
+                
+                // If no values have actually changed, skip this request.
+                if (count($updatedValues) < 1) continue;
+                
+                // Build a query based on the updated values
+                $sql = "UPDATE calls SET ";
+                foreach ($updatedValues as $k => $v)
+                {
+                    $sql .= "$k = ?,";
+                }
+                $sql = substr($sql, 0, -1);
+                $sql .= " WHERE cid = ?";
+                
+                // Add call ID to value list for insertion
+                $values = array_values($updatedValues);
+                $values[] = $cid;
+                
+                // Execute update
+                $db->beginTransaction();
+                $statement = $db->prepare($sql);
+                $statement->execute($values);
+                $db->commit();
+                
+                $updCount++;
+            }
+        }
     
+        // Set status values (client uses these to verify request was successful)
         $response["status"]["added"] = isset($newCount) ? $newCount : 0;
-        $response["status"]["expired"] = isset($expCount) ? $expCount : 0;    
+        $response["status"]["expired"] = isset($expCount) ? $expCount : 0;
+        $response["status"]["updated"] = isset($updCount) ? $updCount : 0;
     }
     
     // Parse geocode data
@@ -163,10 +260,14 @@
     echo json_encode($response);
     
     // If changes were made to the dataset, update the current call list.
-    $status = $response["status"];
-    if (($status["added"] > 0) or ($status["expired"] > 0) or ($status["resolved"] > 0))
+    $genStatus = array("added", "expired", "resolved", "updated");
+    foreach ($genStatus as $s)
     {
-        include "generate.php";
+        if (array_key_exists($s, $response["status"]) and $response["status"][$s] > 0)
+        {
+            include "generate.php";
+            break;
+        }
     }
 
 ?>

@@ -1,10 +1,12 @@
 
+# Combines two lists of calls and returns the resulting list
 def merge(old, new):
     # Hash the calls in each collection
     oldCalls = { c.getKey() : c for c in old }
     newCalls = { c.getKey() : c for c in new }
 
     final = { }
+    changes = { }
 
     # Find newly added calls (in new but not old)
     added = { }
@@ -18,12 +20,44 @@ def merge(old, new):
         if (not k in newCalls):
             removed[k] = c
         else:
-            final[k] = c
+            final[k] = newCalls[k]
+
+            # Check for changes in call data
+            cm = compare(c, final[k])
+            if cm and len(cm) > 0:
+                changes[k] = cm
 
     # Add new calls to the final collection
     final.update(added)
 
-    return final, added, removed
+    return final, added, removed, changes
+
+# Compares two CallData objects and returns the functional difference
+def compare(a, b):
+    diff = { }
+    
+    repA = a.getReportData()
+    repB = b.getReportData()
+
+    # Compare all values in top 2 levels
+    for k,v in repB.items():
+        # Skip items where there is nothing to compare
+        if not k in repA: continue
+        if repA[k] is None: continue
+
+        if isinstance(v, dict):     # Check sub-dictionaries (metadata)
+            sub = { }
+            for sk,sv in v.items():
+                if sv != repA[k][sk]:
+                    sub[sk] = sv
+
+            if len(sub) > 0:
+                diff[k] = sub
+        else:
+            if v != repA[k]:
+                diff[k] = v
+    
+    return diff
     
 
 class CallData():
@@ -72,6 +106,7 @@ class CallData():
             data["geo_lat"] = self.coords[0]
             data["geo_lng"] = self.coords[1]
         return data
+
 
 
 

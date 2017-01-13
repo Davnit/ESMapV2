@@ -1,5 +1,40 @@
 <?php
     
+    function extractLocationData($dataArray, $processLocation = true)
+    {
+        // Validate input type
+        if (is_array($dataArray) == false)
+            return null;
+        
+        // Validate input content
+        if (array_key_exists("location", $dataArray) == false)
+            return null;
+        
+        if (strlen($dataArray["location"]) == 0)
+            return null;
+        
+        // default values
+        $data = array("location" => null, "latitude" => null, "longitude" => null);
+        
+        // Process the location if desired
+        $data["location"] = $dataArray["location"];
+        if ($processLocation)
+        {
+            $proc = processLocation($data["location"]);
+            if ($proc)
+                $data["location"] = $proc;
+        }
+        
+        // Check for provided coordinates
+        if (array_key_exists("geo_lat", $dataArray) and array_key_exists("geo_lng", $dataArray))
+        {
+            $data["latitude"] = $dataArray["geo_lat"];
+            $data["longitude"] = $dataArray["geo_lng"];
+        }
+        
+        return $data;
+    }
+    
     function processLocation($location)
     {
         $removeAll = array("EBO", "EB", "WBO", "WB", "NBO", "NB", "SBO", "SB");

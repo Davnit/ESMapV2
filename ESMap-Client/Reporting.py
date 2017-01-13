@@ -5,11 +5,12 @@ import WebClient
 
 
 class SourceUpdateReport():
-    def __init__(self, source, result, added, removed):
+    def __init__(self, source, result, added, removed, updated):
         self.source = source
         self.active = result
         self.added = added
         self.expired = removed
+        self.updated = updated
 
     def hasChanges(self):
         return len(self.added) > 0 or len(self.expired) > 0
@@ -18,7 +19,8 @@ class SourceUpdateReport():
         return {
             "source": self.source.id,
             "new": [ v.getReportData() for v in self.added.values() ],
-            "expired": [ v.getKey() for v in self.expired.values() ]
+            "expired": [ v.getKey() for v in self.expired.values() ],
+            "updated": { k: v for k,v in self.updated.items() }
         }
 
     def sendChangeReport(self, url):
@@ -35,11 +37,12 @@ class SourceUpdateReport():
                 match = True
                 if status["added"] != len(self.added): match = False
                 if status["expired"] != len(self.expired): match = False
+                if status["updated"] != len(self.updated): match = False
 
                 # Did the server accept all of the changes?
                 if not match:
-                    msg = "Reporting mismatch. Server added {0} rows, expired {1}."
-                    print(msg.format(status["added"], status["expired"]))
+                    msg = "Reporting mismatch. Server added {0} rows, expired {1}, updated {2}."
+                    print(msg.format(status["added"], status["expired"], status["updated"]))
                 else:
                     return True
             else:
@@ -65,6 +68,18 @@ class SourceUpdateReport():
             print("\tEXPIRED:")
             for c in self.expired.values():
                 print("\t\t", c.getShortDisplayString())
+
+        if len(self.updated) > 0:
+            print("\tUPDATED:")
+            for c in self.updated.keys():
+                print("\t\t", c)
+                for k,v in self.updated[c].items():
+                    # Also print changes in sub-dictionaries
+                    if isinstance(v, dict):
+                        for sk,sv in v.items():
+                            print("\t\t\tmeta.{0}: {1}".format(sk, sv))
+                    else:
+                        print("\t\t\t{0}: {1}".format(k, v))
 
 
 class GeocodeReport():

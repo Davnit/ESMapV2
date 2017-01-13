@@ -54,10 +54,10 @@ while True:
 
             # If data was returned, merge the new data with the existing
             if calls:
-                result, added, removed = Calls.merge(active_calls[src.id], calls)
+                result, added, removed, updates = Calls.merge(active_calls[src.id], calls)
                 active_calls[src.id] = result.values()
 
-                report = Reporting.SourceUpdateReport(src, result, added, removed)
+                report = Reporting.SourceUpdateReport(src, result, added, removed, updates)
 
                 # Show the changes
                 if report.hasChanges():
