@@ -101,7 +101,7 @@ def check(source):
     # Retrieve the page contents
     ok, data = WebClient.openUrl(source.url)
     if not ok:
-        print("ERROR! {0}".format(data))
+        print("ERROR! Failed to open source {0}: {1}".format(source.tag, data))
         return False
     
     results = [ ]       # Provides a place for the parser script to store data
