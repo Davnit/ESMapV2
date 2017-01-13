@@ -14,7 +14,7 @@ def verifyGeo(lat, lng):
                "northeast": { "lat": 28.7860889, "lng": -80.870879 }}
     
     # Check for default coordinates (these are specified in the source's own code)
-    if (lat == "28.539555") and (lng == "81.374692"):
+    if (lat == "28.539555") and (lng == "-81.374692"):
         return False
         
     lat = float(lat)
