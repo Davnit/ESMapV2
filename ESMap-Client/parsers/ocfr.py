@@ -51,7 +51,7 @@ if tableContainerId in data:
             meta["unit"]        = tdsplit(r, "UNITLabel")
             
             locStr = tdsplit(r, "STREET_NAME")
-            if not ("/" in locStr):
+            if not ("/" in locStr.replace(" N/A", "")):
                 locStr = tdsplit(r, "STREET_NO") + " " + locStr
             meta["location"] = locStr
             
@@ -62,9 +62,11 @@ if tableContainerId in data:
                 ct = ct
             else:
                 ct = "General"
+
+            locStr = locStr.replace(" N/A", "").replace("STATE ROAD ", "FL-").replace("/", " AND ")
                 
             row_data["key"] = "OCFR-" + meta["call_number"]
-            row_data["location"] = locStr.replace("/", " AND ")
+            row_data["location"] = locStr
             row_data["category"] = ct
             row_data["meta"] = meta
     
