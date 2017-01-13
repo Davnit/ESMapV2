@@ -5,11 +5,12 @@
         $removeAll = array("EBO", "EB", "WBO", "WB", "NBO", "NB", "SBO", "SB");
         $removeStart= array("#", "APT");
         
-        $suffixes = array("RD", "DR", "ST", "TRL", "AVE", "LN", "BLVD", "WAY", "PKWY", "CIR", "CT", "PL");
+        $suffixes = array("RD", "DR", "ST", "TRL", "AVE", "LN", "BLVD", "WAY", "PKWY", "CIR", "CT", "PL", "TER");
         
+        // normal -> [ abbreviations ]
         $abbrev = array(
             "RD" => array("ROAD"), "ST" => array("STREET"), "DR" => array("DRIVE"), "CT" => array("COURT"),
-            "LN" => array("LANE"), "WAY" => array("WY"), "PL" => array("PLC", "PLACE"),
+            "LN" => array("LANE"), "WAY" => array("WY"), "PL" => array("PLC", "PLACE"), "TER" => array("TERRACE"),
             "PKWY" => array("PY", "PK", "PKY", "PARKWAY"), "AVE" => array("AV", "AVENUE"),
             "TRL" => array("TL", "TR", "TRAIL"), "CIR" => array("CR", "CIRCLE"), "PLZ" => array("PZ", "PLAZA"),
             "BLVD" => array("BV", "BVD", "BOULEVARD"), "EXPRESSWAY" => array("EXP", "EXPY")
