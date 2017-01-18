@@ -46,7 +46,7 @@ if tableContainerId in data:
             meta = { }
             meta["call_number"] = tdsplit(r, "CALL_NO")
             meta["call_time"]   = tdsplit(r, "DISPATCH_TIME")
-            meta["description"] = tdsplit(r, "CALL_DESCRIPTION")
+            meta["description"] = tdsplit(r, "CALL_DESCRIPTION").replace("  ", " ")
             meta["call_type"]   = tdsplit(r, "CALL_TYPE")
             meta["unit"]        = tdsplit(r, "UNITLabel")
             
