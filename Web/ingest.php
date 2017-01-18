@@ -7,11 +7,10 @@
         $response = array(
             "status" => array(
                 "success" => false,
-                "message" => $message,
+                "message" => $message
             )
         );
-        echo json_encode($response);
-        return;
+        print(json_encode($response));
     }
     
     if (!isset($_POST["calldata"]) and !isset($_POST["geodata"])) {
@@ -257,7 +256,7 @@
         $response["status"]["resolved"] = $updateCount;
     }
     
-    echo json_encode($response);
+    print(json_encode($response));
     
     // If changes were made to the dataset, update the current call list.
     $genStatus = array("added", "expired", "resolved", "updated");
