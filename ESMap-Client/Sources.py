@@ -1,4 +1,5 @@
 
+import json
 import WebClient, Calls
 from os import path
 from datetime import datetime
@@ -39,21 +40,30 @@ def getRemoteSources(sourceUrl):
 
     # Request sources from remote server
     ok, response = WebClient.openUrl(sourceUrl, { "request": 1 })
-    if ok and not response.startswith("FAIL"):
-        data = response.split("\r\n")
-
-        for itm in list(filter(None, data)):
-            s = itm.split("|")
-
-            # Web sources should always have all of the data
-            source = CallSource(s[1], s[2], getParserPath(s[3]))
-            source.id = int(s[0])
-            source.interval = int(s[4])
-
-            verifyParser(source.parser)
-            sources[source.id] = source
-    else:
+    if not ok:
         print("ERROR! Unable to obtain sources: " + str(response))
+        return sources
+
+    # Decode returned data and check status
+    data = json.loads(response)
+    
+    status = data["status"]
+    if not status["success"]:
+        print("ERROR: Error getting sources: " + status["message"])
+        return sources
+
+    # Check for returned values
+    if not isinstance(data["data"], dict):
+        return sources
+
+    # Parse returned values
+    for srcID, sInfo in data["data"].items():
+        src = CallSource(sInfo["tag"], sInfo["url"], getParserPath(sInfo["parser"]))
+        src.id = srcID
+        src.interval = int(sInfo["interval"])
+
+        verifyParser(src.parser)
+        sources[src.id] = src
 
     return sources
 

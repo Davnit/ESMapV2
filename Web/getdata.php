@@ -1,43 +1,83 @@
 <?php
 
+    function reportError($message)
+    {
+        $response = array(
+            "status" => array(
+                "success" => false,
+                "message" => $message
+            )
+        );
+        print(json_encode($response));
+    }
+    
     // Check for request
     if (!isset($_GET["request"]))
     {
-        die("FAIL No request");
+        reportError("No request");
+        die();
     }
     
     // Validate request
     $request = $_GET["request"];
     if (!is_numeric($request))
     {
-        die("FAIL Bad request");
+        reportError("Invalid request");
+        die();
     }
     
     require_once "lib/Database.php";
     
     $request = intval($request);
     
+    // Default response
+    $response = array(
+        "status" => array(
+            "success" => true
+        ),
+        "data" => array()
+    );
+    
     switch ($request)
     {
         case 1:     # Source assignments
-            $data = getData("SELECT * FROM sources");
+            $data = getData("SELECT id, tag, url, parser, update_time FROM sources");
             
+            $sources = array();
             foreach ($data as $d)
             {
-                print(implode("|", [ $d["id"], $d["tag"], $d["url"], $d["parser"], $d["update_time"] ]) . "\r\n");
+                $sources[$d["id"]] = array(
+                    "tag" => $d["tag"],
+                    "url" => $d["url"],
+                    "parser" => $d["parser"],
+                    "interval" => $d["update_time"]
+                );
             }
+            $response["data"] = $sources;
             break;
             
         case 2:     # Client/server sync
-            $data = getData("SELECT source, cid FROM calls WHERE expired IS NULL ORDER BY id ASC");
+            $sql = "SELECT c.source, c.cid, g.location, c.category, c.meta FROM calls c ";
+            $sql .= "LEFT JOIN geocodes g ON c.geoid = g.id ";
+            $sql .= "WHERE expired IS NULL ORDER BY c.id ASC";
+            $data = getData($sql);
             
+            $calls = array();
             foreach ($data as $d)
             {
-                print(implode("|", [ $d["source"], $d["cid"] ]) . "\r\n");
+                $src = intval($d["source"]);
+                if (!array_key_exists($src, $calls))
+                    $calls[$src] = array();
+                
+                $calls[$src][$d["cid"]] = array(
+                    "category" => $d["category"],
+                    "location" => $d["location"],
+                    "meta" => $d["meta"]);
             }
+            $response["data"] = $calls;
             break;
             
-        case 3:     # Geocode requests
+        case 3:     # Geocode requests  
             $data = getData("SELECT id, location FROM geocodes WHERE results IS NULL AND latitude IS NULL AND longitude IS NULL");
             
             $geo = array();
@@ -45,11 +85,14 @@
             {
                 $geo[$d["id"]] = $d["location"];
             }
-            print(json_encode(array("geocodes" => $geo)));
+            $response["data"] = $geo;
             break;
             
         default:
-            die("FAIL Unrecognized request");
+            reportError("Unrecognized request");
+            die();
     }
+    
+    print(json_encode($response));
 
 ?>

@@ -8,17 +8,23 @@ def getRequests(sourceUrl):
 
     ok, response = WebClient.openUrl(sourceUrl, { "request": 3 })
     if not ok:
+        print("ERROR Unable to obtain geocode requests: " + str(response))
         return requests     # Return no requests
     
-    # Parse the response data into a list of requests
+    # Decode the returned JSON and check the response status
     data = json.loads(response)
+    
+    status = data["status"]
+    if not status["success"]:
+        print("ERROR Obtaining geocode requests: " + status["message"])
+        return requests
 
     # Check if values were returned
-    if not isinstance(data["geocodes"], dict):
+    if not isinstance(data["data"], dict):
         return requests
 
     # Parse the returned values
-    for id, location in data["geocodes"].items():
+    for id, location in data["data"].items():
         req = GeocodeRequest(id, location)
         req.filter = { "country": [ "US" ], "administrative_area": [ "Florida", "Orange County" ] }
         requests.append(req)

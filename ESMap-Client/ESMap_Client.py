@@ -30,18 +30,27 @@ if c.UseRemoteServer and len(c.DataUrl) > 0:
 
     ok, response = WebClient.openUrl(c.DataUrl, { "request": 2 })
     if ok:
-        if response.startswith("FAIL"):
-            print("\t... " + response)
-        else:
-            calls = response.split("\r\n")
-            for call in list(filter(None, calls)):
-                s = call.split("|")
+        data = json.loads(response)
+        status = data["status"]
 
-                src = sources[int(s[0])]
-                active_calls[src.id].append(Calls.CallData(s[1]))     # Add a dummy CallData instance, with only the key.
-                print("\t{0} [{1}]: {2}".format(src.tag, src.id, s[1]))
+        if status["success"] and isinstance(data["data"], dict):
+            for srcID, calls in data["data"].items():
+                src = sources[srcID]
+
+                for cID, call in calls.items():
+                    # Create a call object to represent this item
+                    callObj = Calls.CallData(json.loads(call["meta"]))
+                    callObj.category = call["category"]
+                    callObj.location = call["location"]
+                    callObj.key = cID
+                    callObj.source = src
+            
+                    active_calls[src.id].append(callObj)
+                    print("\t{0}: {1}".format(src.tag, callObj.getShortDisplayString()))
+        else:
+            print("\t...", status["message"])
     else:
-        print("\t... failed: " + response)
+        print("\t... failed: " + str(response))
 
 # Run
 while True:
