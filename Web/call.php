@@ -47,7 +47,8 @@
     $meta = json_decode($data["meta"], true);
     foreach ($meta as $key => $value)
     {
-        $table[$key] = $value;
+        $dispKey = ucwords(str_replace("_", " ", $key));
+        $table[$dispKey] = $value;
     }
 
 ?>
