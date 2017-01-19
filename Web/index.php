@@ -8,16 +8,20 @@
         <script type="text/javascript" src="https://www.google.com/jsapi"></script>
         <script type="text/javascript">
             var lastUpdate = null;
+            var timerID = null;
             var map = null;
             
             google.load("visualization", "1", { packages: [ "map" ] });
             google.setOnLoadCallback(startup);
             
             function startup() {
-                map = new google.visualization.Map(document.getElementById("map"));
+                var mapDiv = document.getElementById("map");
+                mapDiv.addEventListener("mousedown", resetTimer);
+                
+                map = new google.visualization.Map(mapDiv);
                 
                 populateMap();
-                setInterval(populateMap, <?php echo (intval($config["page_refresh"]) * 1000); ?>);
+                timerID = setInterval(populateMap, <?php echo (intval($config["page_refresh"]) * 1000); ?>);
             }
             
             function populateMap() {
@@ -66,6 +70,11 @@
                         map.draw(google.visualization.arrayToDataTable(data), options);
                     }
                 });
+            }
+            
+            function resetTimer() {
+                clearInterval(timerID);
+                timerID = setInterval(populateMap, <?php echo (intval($config["map_activity_delay"]) * 1000); ?>);
             }
         </script>
         
