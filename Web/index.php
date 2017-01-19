@@ -76,7 +76,7 @@
             }
         </style>
         
-        <title>ESMap - Call Map</title>
+        <title>Live Map - <?php echo $config["app_title"]; ?></title>
     </head>
     
     <body>

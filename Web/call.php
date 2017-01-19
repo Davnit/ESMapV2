@@ -1,5 +1,7 @@
 <?php
     
+    $config = require("lib/Config.php");
+    
     function showError($message)
     {
         die($message);
@@ -111,7 +113,7 @@
             }
         </style>
         
-        <title>ESMap - Call Details</title>
+        <title>Call Details - <?php echo $config["app_title"]; ?></title>
     </head>
     
     <body>

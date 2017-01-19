@@ -54,7 +54,7 @@
             }
         </style>
         
-        <title>ESMap - Call Log</title>
+        <title>Call Log - <?php echo $config["app_title"]; ?></title>
     </head>
     
     <body>
