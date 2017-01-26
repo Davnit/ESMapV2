@@ -28,14 +28,21 @@
         );
     }
     
-    #array_map(function ($x) { return explode("|", str_replace(",", "|", $x)); }, array_column($sourceList, "bounds", "id"));    
-    
     // Get list of active or recently expired calls.
     $sql = "SELECT c.source, c.category, c.meta, c.added, c.expired, g.latitude, g.longitude FROM calls c ";
     $sql .= "LEFT JOIN geocodes g ON g.id = c.geoid ";
-    $sql .= "WHERE c.expired IS NULL OR (c.expired >= NOW() - INTERVAL " . $config["history_time"] . ")";    
+    $sql .= "WHERE c.expired IS NULL";
+
+    // Include recently expired calls
+    $historyTime = $config["history_time"];
+    if (strlen($historyTime) > 0) {
+        $sql .= " OR (c.expired >= NOW() - INTERVAL $historyTime)";
+    }
+    
+    
     $callList = getData($sql);
     
+    // Organize data to be written
     $mapCalls = array();
     $tableCalls = array();
     foreach ($callList as $cL)
