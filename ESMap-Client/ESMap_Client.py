@@ -33,20 +33,23 @@ if c.UseRemoteServer and len(c.DataUrl) > 0:
         data = json.loads(response)
         status = data["status"]
 
-        if status["success"] and isinstance(data["data"], dict):
-            for srcID, calls in data["data"].items():
-                src = sources[srcID]
+        if status["success"]:
+            if isinstance(data["data"], dict):
+                for srcID, calls in data["data"].items():
+                    src = sources[srcID]
 
-                for cID, call in calls.items():
-                    # Create a call object to represent this item
-                    callObj = Calls.CallData(json.loads(call["meta"]))
-                    callObj.category = call["category"]
-                    callObj.location = call["location"]
-                    callObj.key = cID
-                    callObj.source = src
+                    for cID, call in calls.items():
+                        # Create a call object to represent this item
+                        callObj = Calls.CallData(json.loads(call["meta"]))
+                        callObj.category = call["category"]
+                        callObj.location = call["location"]
+                        callObj.key = cID
+                        callObj.source = src
             
-                    active_calls[src.id].append(callObj)
-                    print("\t{0}: {1}".format(src.tag, callObj.getShortDisplayString()))
+                        active_calls[src.id].append(callObj)
+                        print("\t{0}: {1}".format(src.tag, callObj.getShortDisplayString()))
+            else:
+                print("\t... No calls active.")
         else:
             print("\t...", status["message"])
     else:
