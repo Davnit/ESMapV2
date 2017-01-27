@@ -29,7 +29,7 @@
     }
     
     // Get list of active or recently expired calls.
-    $sql = "SELECT c.source, c.category, c.meta, c.added, c.expired, g.latitude, g.longitude FROM calls c ";
+    $sql = "SELECT c.id, c.source, c.category, c.meta, c.added, c.expired, g.latitude, g.longitude FROM calls c ";
     $sql .= "LEFT JOIN geocodes g ON g.id = c.geoid ";
     $sql .= "WHERE c.expired IS NULL";
 
@@ -47,6 +47,7 @@
     $tableCalls = array();
     foreach ($callList as $cL)
     {
+        $id = intval($cL["id"]);
         $src = intval($cL["source"]);
         $meta = json_decode($cL["meta"]);
         
@@ -103,7 +104,7 @@
         $callTime = (strlen($meta->call_time) > 0) ? $meta->call_time : $added;
         
         // The call log table contains slightly more information about every call.
-        $tableCalls[] = array(
+        $tableCalls[$id] = array(
             "dept" => $src,                     # ID of the call source
             "desc" => $meta->description,       # Call description
             "loc" => $meta->location,           # Unprocessed location of the call

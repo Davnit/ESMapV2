@@ -10,11 +10,14 @@
             var lastUpdate = null;
             var table = null;
             
+            var IDList = {}
+            
             google.load("visualization", "1", { packages: [ "table" ] });
             google.setOnLoadCallback(startup);
             
             function startup() {
                 table = new google.visualization.Table(document.getElementById("table"));
+                google.visualization.events.addListener(table, 'select', selectHandler);
                 
                 populateTable();
                 setInterval(populateTable, <?php echo (intval($config["page_refresh"]) * 1000); ?>);
@@ -31,9 +34,13 @@
                             [ "Source", "Description", "Location", "Call Time", "Closed" ]
                         ];
                         
-                        for (i = 0; i < obj.calls.length; i++) {
-                            item = obj.calls[i];
+                        var counter = 0;
+                        for (var id in obj.calls) {
+                            item = obj.calls[id];
+                            
                             data.push([ obj.sources[item.dept], item.desc, item.loc, item.time, item.closed ]);
+                            IDList[counter] = id;
+                            counter++;
                         }
                         
                         var options = {
@@ -44,6 +51,16 @@
                         table.draw(google.visualization.arrayToDataTable(data), options);
                     }
                 });
+            }
+            
+            function selectHandler() {
+                var selection = table.getSelection();
+                if (selection.length > 0) {
+                    var row = selection[0].row;
+                    if (row in IDList) {
+                        window.location.href = "call.php?id=" + IDList[row];
+                    }
+                }
             }
         </script>
         
