@@ -57,6 +57,9 @@ for idx in range(1, len(infoList)):
         if loc.split()[0].isdigit():
             loc = loc.split("[")[0]
             
+        # Replace SR- (state road) prefix with the state FL
+        loc = loc.replace("SR-", "FL-")
+            
         row_data["location"]  = loc
         row_data["category"]  = call_type
         row_data["meta"]      = meta
