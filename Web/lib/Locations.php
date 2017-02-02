@@ -37,7 +37,7 @@
     
     function processLocation($location)
     {
-        $removeAll = array("EBO", "EB", "WBO", "WB", "NBO", "NB", "SBO", "SB");
+        $removeAll = array("EBO", "EB", "WBO", "WB", "NBO", "NB", "SBO", "SB", "EX");
         $removeStart= array("#", "APT");
         
         $suffixes = array("RD", "DR", "ST", "TRL", "AVE", "LN", "BLVD", "WAY", "PKWY", "CIR", "CT", "PL", "TER");
