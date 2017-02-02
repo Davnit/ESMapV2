@@ -41,8 +41,10 @@ class SourceUpdateReport():
 
                 # Did the server accept all of the changes?
                 if not match:
-                    msg = "Reporting mismatch. Server added {0} rows, expired {1}, updated {2}."
-                    print(msg.format(status["added"], status["expired"], status["updated"]))
+                    msg = "Reporting mismatch. Server added {0}/{1} rows, expired {2}/{3}, updated {4}/{5}."
+                    print(msg.format(status["added"], len(self.added), 
+                                     status["expired"], len(self.expired), 
+                                     status["updated"], len(self.updated)))
                 else:
                     return True
             else:
