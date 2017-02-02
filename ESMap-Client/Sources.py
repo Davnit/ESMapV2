@@ -57,10 +57,13 @@ def getRemoteSources(sourceUrl):
         return sources
 
     # Parse returned values
+    # Format: { id => [ tag, url, parser, interval ] }
     for srcID, sInfo in data["data"].items():
-        src = CallSource(sInfo["tag"], sInfo["url"], getParserPath(sInfo["parser"]))
+        print(type(sInfo))
+
+        src = CallSource(sInfo[0], sInfo[1], getParserPath(sInfo[2]))
         src.id = srcID
-        src.interval = int(sInfo["interval"])
+        src.interval = int(sInfo[3])
 
         verifyParser(src.parser)
         sources[src.id] = src

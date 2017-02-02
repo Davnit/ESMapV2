@@ -35,14 +35,15 @@ if c.UseRemoteServer and len(c.DataUrl) > 0:
 
         if status["success"]:
             if isinstance(data["data"], dict):
+                # Format: data => source: { cid => [ category, location, meta ] }
                 for srcID, calls in data["data"].items():
                     src = sources[srcID]
 
                     for cID, call in calls.items():
                         # Create a call object to represent this item
-                        callObj = Calls.CallData(json.loads(call["meta"]))
-                        callObj.category = call["category"]
-                        callObj.location = call["location"]
+                        callObj = Calls.CallData(json.loads(call[2]))
+                        callObj.category = call[0]
+                        callObj.location = call[1]
                         callObj.key = cID
                         callObj.source = src
             

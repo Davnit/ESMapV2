@@ -46,12 +46,7 @@
             $sources = array();
             foreach ($data as $d)
             {
-                $sources[$d["id"]] = array(
-                    "tag" => $d["tag"],
-                    "url" => $d["url"],
-                    "parser" => $d["parser"],
-                    "interval" => $d["update_time"]
-                );
+                $sources[$d["id"]] = array($d["tag"], $d["url"], $d["parser"], $d["update_time"]);
             }
             $response["data"] = $sources;
             break;
@@ -69,10 +64,7 @@
                 if (!array_key_exists($src, $calls))
                     $calls[$src] = array();
                 
-                $calls[$src][$d["cid"]] = array(
-                    "category" => $d["category"],
-                    "location" => $d["location"],
-                    "meta" => $d["meta"]);
+                $calls[$src][$d["cid"]] = array($d["category"], $d["location"], $d["meta"]);
             }
             $response["data"] = $calls;
             break;
