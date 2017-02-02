@@ -46,11 +46,27 @@
             {
                 $calls[$row["key"]] = [ $source, $row["key"], $row["category"], null, json_encode($row["meta"]) ];
                 
-                $locations[$row["key"]] = extractLocationData($row);
+                // Extract coordinates, if supplied.
+                $locData = extractLocationData($row);
+                if ($locData !== null)
+                {
+                    // Normalize and verify the location string
+                    $proc = processLocation($locData["location"]);
+                    
+                    // If the location is valid, set it to the normalized version
+                    if ($proc !== false)
+                    {
+                        $locData["location"] = $proc;
+                    }
+                    else
+                    {
+                        if ($locData["latitude"] == null or $locData["longitude"] == null)
+                            continue;
+                    }
+                    
+                    $locations[$row["key"]] = $locData;
+                }
             }
-            
-            // Remove bad locations
-            $locations = array_filter($locations, function($x) { return is_array($x); });
         
             // Add new locations to geocode table
             if (count($locations) > 0)
@@ -99,9 +115,18 @@
             $newLocations = array();
             foreach ($data["updated"] as $cid => $row)
             {
-                $newLocations[$cid] = extractLocationData($row);
+                $locData = extractLocationData($row);
+                if ($locData != null)
+                {
+                    $proc = processLocation($locData["location"]);
+                    
+                    if ($proc !== false or ($locData["latitude"] == null and $locData["longitude"] == null))
+                    {
+                        $locData["location"] = $proc;
+                        $newLocations[$cid] = $locData;
+                    }
+                }
             }
-            $newLocations = array_filter($newLocations, function($x) { return is_array($x); });
             
             if (count($newLocations) > 0)
             {
