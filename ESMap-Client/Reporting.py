@@ -13,7 +13,7 @@ class SourceUpdateReport():
         self.updated = updated
 
     def hasChanges(self):
-        return len(self.added) > 0 or len(self.expired) > 0
+        return len(self.added) > 0 or len(self.expired) > 0 or len(self.updated) > 0
 
     def getChangeData(self):
         return {
