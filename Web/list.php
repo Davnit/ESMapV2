@@ -37,8 +37,9 @@
                         var counter = 0;
                         for (var id in obj.calls) {
                             item = obj.calls[id];
+                            item[0] = obj.sources[item[0]];
+                            data.push(item);
                             
-                            data.push([ obj.sources[item.dept], item.desc, item.loc, item.time, item.closed ]);
                             IDList[counter] = id;
                             counter++;
                         }

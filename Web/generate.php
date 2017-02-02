@@ -78,12 +78,8 @@
             if ($verified)
             {
                 // Add the point to the map list
-                $mapCalls[] = array(
-                    "category" => $cL["category"],
-                    "desc" => sprintf("%s @ %s", $meta->description, $meta->location),
-                    "lat" => $fLat, 
-                    "lng" => $fLng
-                );
+                //   Format: [ latitude, longitude, tooltip, marker ]
+                $mapCalls[] = array($fLat, $fLng, sprintf("%s @ %s", $meta->description, $meta->location), $cL["category"]);
             }
         }
         
@@ -104,13 +100,8 @@
         $callTime = (strlen($meta->call_time) > 0) ? $meta->call_time : $added;
         
         // The call log table contains slightly more information about every call.
-        $tableCalls[$id] = array(
-            "dept" => $src,                     # ID of the call source
-            "desc" => $meta->description,       # Call description
-            "loc" => $meta->location,           # Unprocessed location of the call
-            "time" => $callTime,                # The time the call was made or found
-            "closed" => $expired                # The time the call was closed/expired (or null if its ongoing)
-        );
+        //   Format: [ source, description, location, call time, closed time]
+        $tableCalls[$id] = array($src, $meta->description, $meta->location, $callTime, $expired);
     }
     
     // Create the object for the live map and serialize it
@@ -118,7 +109,7 @@
         "updated" => time(),
         "calls" => $mapCalls
     );
-    file_put_contents("data/livemap.json", json_encode($obj, JSON_PRETTY_PRINT));
+    file_put_contents("data/livemap.json", json_encode($obj));
     
     // Create the object for the call list and serialize it.
     $obj = array(
@@ -126,6 +117,6 @@
         "sources" => array_column($sourceList, "tag", "id"),
         "calls" => $tableCalls
     );
-    file_put_contents("data/call_log.json", json_encode($obj, JSON_PRETTY_PRINT));
+    file_put_contents("data/call_log.json", json_encode($obj));
 
 ?>

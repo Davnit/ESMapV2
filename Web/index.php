@@ -40,8 +40,7 @@
                         ];
                         
                         for (i = 0; i < obj.calls.length; i++) {
-                            item = obj.calls[i];
-                            data.push([ item.lat, item.lng, item.desc, item.category ]);
+                            data.push(obj.calls[i]);
                         }
                     
                         var iconBin = "<?php echo $config["icon_bin"]; ?>";
