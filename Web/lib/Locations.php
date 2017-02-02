@@ -60,6 +60,8 @@
         $addresses = explode(" AND ", $location);
         foreach ($addresses as $address)
         {
+            $thisAddress = array();
+            
             $elements = explode(" ", $address);
             
             // Check for a street number
@@ -68,7 +70,6 @@
                 return false;
             }
             
-            $foundSuffix = false;
             foreach ($elements as $e)
             {
                 if (strlen(trim($e)) === 0) continue;    # Skip empty elements
@@ -106,26 +107,24 @@
                     }
                 }
                 
-                // Check for suffixes, which signify the end of the useful part of the address
-                if ($foundSuffix == false)
-                {
-                    if (in_array($e, $suffixes)) $foundSuffix = true;
-                }
-                else
-                    break;
-                
                 // Add the finished element to the return location
-                $returnLocation[] = $e;
+                $thisAddress[] = $e;
+                
+                // Check for the end of the address part
+                if (in_array($e, $suffixes))
+                {
+                    $elementsNeeded = ($intersection == true ? 2 : 3);  # How many elements are needed to be a complete address
+                    if (count($thisAddress) >= $elementsNeeded)
+                        break;
+                }
             }
             
             // Add the intersection delimeter if needed
-            if ($intersection)
-                $returnLocation[] = "AND";
+            if (count($returnLocation) > 0) $returnLocation[] = "AND";
+            
+            // Add this address to the return location
+            $returnLocation = array_merge($returnLocation, $thisAddress);
         }
-        
-        // If processing an intersection, remove the final "AND"
-        if ($intersection)
-            array_pop($returnLocation);
         
         return implode(" ", $returnLocation);
     }
