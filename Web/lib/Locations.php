@@ -10,7 +10,7 @@
         if (array_key_exists("location", $dataArray) == false)
             return null;
         
-        if (strlen($dataArray["location"]) == 0)
+        if (strlen(trim($dataArray["location"])) < 1)
             return null;
         
         // default values
@@ -117,7 +117,12 @@
             $returnLocation = array_merge($returnLocation, $thisAddress);
         }
         
-        return implode(" ", $returnLocation);
+        $location = implode(" ", $returnLocation);
+        
+        if (strlen(trim($location)) < 1)
+            return false;
+        
+        return $location;
     }
     
 ?>
