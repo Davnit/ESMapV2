@@ -1,6 +1,6 @@
 <?php
     
-    function extractLocationData($dataArray, $processLocation = true)
+    function extractLocationData($dataArray)
     {
         // Validate input type
         if (is_array($dataArray) == false)
@@ -14,16 +14,7 @@
             return null;
         
         // default values
-        $data = array("location" => null, "latitude" => null, "longitude" => null);
-        
-        // Process the location if desired
-        $data["location"] = $dataArray["location"];
-        if ($processLocation == true)
-        {
-            $proc = processLocation($data["location"]);
-            if ($proc !== false)
-                $data["location"] = $proc;
-        }
+        $data = array("location" => $dataArray["location"], "latitude" => null, "longitude" => null);
         
         // Check for provided coordinates
         if (array_key_exists("geo_lat", $dataArray) and array_key_exists("geo_lng", $dataArray))
