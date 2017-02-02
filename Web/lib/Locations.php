@@ -18,10 +18,10 @@
         
         // Process the location if desired
         $data["location"] = $dataArray["location"];
-        if ($processLocation)
+        if ($processLocation == true)
         {
             $proc = processLocation($data["location"]);
-            if ($proc)
+            if ($proc !== false)
                 $data["location"] = $proc;
         }
         
