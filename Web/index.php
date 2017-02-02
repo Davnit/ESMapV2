@@ -25,7 +25,7 @@
             }
             
             function populateMap() {
-                $.get("data/livemap.json").done(function(obj) {
+                $.ajax("data/livemap.json", { cache: false }).done(function(obj) {
                     var updateTime = new Date(obj.updated);
                     
                     if (lastUpdate == null || updateTime > lastUpdate) {
