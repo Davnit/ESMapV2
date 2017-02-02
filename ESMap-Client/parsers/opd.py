@@ -47,6 +47,7 @@ for idx in range(1, len(calls)):
         if location == "100 S HUGHEY AV":
             location = ""
         else:
+            location = location.replace("CENTRAL FLORIDA GREENEWAY", "FL-417")
             if " / " in location:
                 location = location.replace(" / ", " AND ")
         
