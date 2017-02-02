@@ -7,6 +7,9 @@
 def getValue(xml, eName):
     return xml.split("<" + eName + ">")[1].split("</" + eName + ">")[0].strip()
 
+replacements.update({
+    "BEACHLINE": "FL-528", "TURNPIKE": "FLORIDA TURNPIKE", "GREENWAY": "FL-417"
+})
     
 calls = data.split("<CALL ")
 for idx in range(1, len(calls)):

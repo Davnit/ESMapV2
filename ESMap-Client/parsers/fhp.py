@@ -9,6 +9,11 @@
 def getRowValue(table, name):
     return table.split(name)[1].split("<td")[1].split(">", 1)[1].split("</td>")[0].replace("&nbsp;", " ").strip()
 
+replacements.update({
+    "TURNPIKE": "FLORIDA TURNPIKE", "TPKE": "FLORIDA TURNPIKE",
+    "GREENWAY": "FL-417", "GREENEWAY": "FL-417"
+})
+
 infoList = data.split("<input type=\"hidden\" id=\"popInfo")    
 for idx in range(1, len(infoList)):
     try:

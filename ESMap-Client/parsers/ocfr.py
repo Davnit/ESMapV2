@@ -28,6 +28,10 @@ def verifyGeo(lat, lng):
         
     return True
     
+replacements.update({
+    "BEACHLINE": "FL-528", "GREENWAY": "FL-417",
+    "TURNPIKE": "FLORIDA TURNPIKE", "TPK": "FLORIDA TURNPIKE"
+})
 
 tableContainerId = "lstvwCalls4Svc_itemPlaceholderContainer"
 

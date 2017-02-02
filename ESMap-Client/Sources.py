@@ -115,6 +115,7 @@ def check(source):
         return False
     
     results = [ ]       # Provides a place for the parser script to store data
+    replacements = { }  # Dictionary of localized location elements to be replaced.
 
     # Compile and run the parser script
     try:
@@ -133,7 +134,26 @@ def check(source):
         c.source = source
         c.key = r["key"]
         c.category = r["category"]
-        c.location = r["location"]
+
+        # Do localized location replacements
+        if len(replacements) > 0:
+            location = [ ]
+            for element in r["location"].split():           # For each part of the location
+                found = False
+
+                for find, replace in replacements.items():  # Check for each replacement
+                    if element.upper() == find.upper():
+                        found = True
+                        location.append(replace)
+                        break;
+
+                # If nothing to be replaced was found just add the element
+                if not found:
+                    location.append(element)
+
+            c.location = " ".join(location)
+        else:
+            c.location = r["location"]
 
         # Check for provided coordinates
         if ("geo_lat" in r) and ("geo_lng" in r):
