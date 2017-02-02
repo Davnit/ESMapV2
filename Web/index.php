@@ -31,6 +31,10 @@
                     if (lastUpdate == null || updateTime > lastUpdate) {
                         lastUpdate = updateTime;
                         
+                        var localTime = new Date(0);
+                        localTime.setUTCSeconds(obj.updated);
+                        document.getElementById("updateTime").innerHTML = "Updated: " + localTime.toString();
+                        
                         var data = [
                             [ "Latitude", "Longitude", "Description", "Marker" ]
                         ];
@@ -83,6 +87,16 @@
             #map {
                 height: 100%;
             }
+            
+            #footer {
+                background-color: #143253;
+                display: table-row;
+                color: white;
+            }
+            
+            #updateTime {
+                padding: 2px;
+            }
         </style>
         
         <title>Live Map - <?php echo $config["app_title"]; ?></title>
@@ -93,6 +107,10 @@
 
         <div id="content">
             <div id="map"></div>
+        </div>
+        
+        <div id="footer">
+            <div id="updateTime"></div>
         </div>
     </body>
 </html>
