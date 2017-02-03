@@ -7,6 +7,7 @@
         "db_pass" => "",
         
         "app_title" => "Orange County Emergency Services Activity",
+        "client_key" => "",
         
         "page_refresh" => 60,               # Time, in seconds, between updates of the main content pages (live map. call list)
         "map_activity_delay" => 300,        # Time, in seconds, to wait for page updates after user interaction

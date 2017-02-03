@@ -1,6 +1,7 @@
 <?php
 
     require_once "lib/Locations.php";
+    $config = require("lib/Config.php");
     
     function reportError($message)
     {
@@ -16,6 +17,17 @@
     if (!isset($_POST["calldata"]) and !isset($_POST["geodata"])) {
         reportError("No data provided.");
         die();
+    }
+    
+    // Validate client key
+    $clientKey = $config["client_key"];
+    if (strlen($clientKey) > 0)
+    {
+        if (!isset($_POST["key"]) or ($_POST["key"] !== $clientKey))
+        {
+            reportError("Client not authorized.");
+            die();
+        }
     }
     
     // Access the database

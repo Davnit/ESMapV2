@@ -23,8 +23,11 @@ class SourceUpdateReport():
             "updated": { k: v for k,v in self.updated.items() }
         }
 
-    def sendChangeReport(self, url):
+    def sendChangeReport(self, url, key = None):
         data = { "calldata": json.dumps(self.getChangeData(), separators=(',',':')) }
+
+        if key is not None and len(key) > 0:
+            data["key"] = key
 
         # Submit data
         ok, response = WebClient.postData(url, data)
@@ -92,8 +95,11 @@ class GeocodeReport():
     def getData(self):
         return { r.id: r.results for r in self.requests }
 
-    def sendReport(self, url):
+    def sendReport(self, url, key = None):
         data = { "geodata": json.dumps(self.getData(), separators=(',',':')) }
+
+        if key is not None and len(key) > 0:
+            data["key"] = key
 
         ok, response = WebClient.postData(url, data)
         if ok:
