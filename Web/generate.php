@@ -49,7 +49,7 @@
     {
         $id = intval($cL["id"]);
         $src = intval($cL["source"]);
-        $meta = json_decode($cL["meta"]);
+        $meta = json_decode($cL["meta"], true);
         
         // The live map should only contain calls that have resolved coordinates.
         if (($cL["latitude"] != null) and ($cL["longitude"] != null))
@@ -77,9 +77,14 @@
             
             if ($verified)
             {
+                // Construct tooltip text
+                $tooltip = $meta["description"];
+                if (isset($meta["location"]) and strlen($meta["location"]) > 0)
+                    $tooltip .= " @ " . $meta["location"];
+                
                 // Add the point to the map list
                 //   Format: [ latitude, longitude, tooltip, marker ]
-                $mapCalls[] = array($fLat, $fLng, sprintf("%s @ %s", $meta->description, $meta->location), $cL["category"]);
+                $mapCalls[] = array($fLat, $fLng, $tooltip, $cL["category"]);
             }
         }
         
@@ -97,11 +102,11 @@
         
         // Determine the call's start time. If the source specified a time, use that, otherwise
         //   use the time the call was added to the database.
-        $callTime = (strlen($meta->call_time) > 0) ? $meta->call_time : $added;
+        $callTime = (isset($meta["call_time"]) and strlen($meta["call_time"]) > 0) ? $meta["call_time"] : $added;
         
         // The call log table contains slightly more information about every call.
         //   Format: [ source, description, location, call time, closed time]
-        $tableCalls[$id] = array($src, $meta->description, $meta->location, $callTime, $expired);
+        $tableCalls[$id] = array($src, $meta["description"], $meta["location"], $callTime, $expired);
     }
     
     // Create the object for the live map and serialize it

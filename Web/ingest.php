@@ -40,8 +40,12 @@
         )
     );
     
+    $data = null;
+    
     // Parse call data
-    $data = json_decode($_POST["calldata"], true);
+    if (isset($_POST["calldata"]))
+        $data = json_decode($_POST["calldata"], true);
+    
     if ($data != null)
     {
         // Static data
@@ -242,8 +246,12 @@
         $response["status"]["updated"] = isset($updCount) ? $updCount : 0;
     }
     
+    $data = null;
+    
     // Parse geocode data
-    $data = json_decode($_POST["geodata"], true);
+    if (isset($_POST["geodata"]))
+        $data = json_decode($_POST["geodata"], true);
+    
     if ($data != null)
     {
         $updateCount = 0;
@@ -280,8 +288,8 @@
             
             $sql .= " WHERE id = :geoID";
             $statement = $db->prepare($sql);
-            $statement->bindParam(":results", json_encode($v), PDO::PARAM_STR);
-            $statement->bindParam(":geoID", $k, PDO::PARAM_INT);
+            $statement->bindValue(":results", json_encode($v), PDO::PARAM_STR);
+            $statement->bindValue(":geoID", $k, PDO::PARAM_INT);
             
             // Track the number of successful updates
             if ($statement->execute())
