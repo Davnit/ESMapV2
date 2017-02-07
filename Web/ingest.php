@@ -11,12 +11,11 @@
                 "message" => $message
             )
         );
-        print(json_encode($response));
+        die(json_encode($response));
     }
     
     if (!isset($_POST["calldata"]) and !isset($_POST["geodata"])) {
         reportError("No data provided.");
-        die();
     }
     
     // Validate client key
@@ -26,7 +25,6 @@
         if (!isset($_POST["key"]) or ($_POST["key"] !== $clientKey))
         {
             reportError("Client not authorized.");
-            die();
         }
     }
     
