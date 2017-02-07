@@ -93,7 +93,7 @@ class GeocodeReport():
 
     # Returns a dictionary of ID -> Geocode Results for the requests contained in this report
     def getData(self):
-        return { r.id: r.results for r in self.requests }
+        return { r.id: r.results for r in self.requests if r.resolved == True }
 
     def sendReport(self, url, key = None):
         data = { "geodata": json.dumps(self.getData(), separators=(',',':')) }

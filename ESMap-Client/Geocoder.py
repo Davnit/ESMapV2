@@ -66,7 +66,7 @@ class GeocodeRequest():
 
         # Parse results
         self.results = json.loads(response)
-        if self.results["status"] == "OK":
+        if self.results["status"] in [ "OK", "ZERO_RESULTS" ]:
             self.resolved = True
         return self.resolved
 
