@@ -29,7 +29,14 @@
     }
     
     // Access the database
-    require_once "lib/Database.php";
+    try
+    {
+        require_once "lib/Database.php";
+    }
+    catch (PDOException $pe) 
+    {
+        reportError("Database not available.");
+    }
     
     // Default response
     $response = array(

@@ -8,14 +8,13 @@
                 "message" => $message
             )
         );
-        print(json_encode($response));
+        die(json_encode($response));
     }
     
     // Check for request
     if (!isset($_GET["request"]))
     {
         reportError("No request");
-        die();
     }
     
     // Validate request
@@ -23,10 +22,16 @@
     if (!is_numeric($request))
     {
         reportError("Invalid request");
-        die();
     }
     
-    require_once "lib/Database.php";
+    try
+    {
+        require_once "lib/Database.php";
+    }
+    catch (PDOException $pe)
+    {
+        reportError("Database not available.");
+    }
     
     $request = intval($request);
     

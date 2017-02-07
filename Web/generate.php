@@ -1,6 +1,14 @@
 <?php
 
-    require_once "lib/Database.php";
+    try
+    {
+        require_once "lib/Database.php";
+    }
+    catch (PDOException $pe)
+    {
+        die("Database not available.");
+    }
+    
     $config = require("lib/Config.php");
     
     function convertTimeZone($time, $zone)
