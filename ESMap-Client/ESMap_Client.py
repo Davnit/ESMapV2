@@ -78,7 +78,7 @@ while True:
 
                     # Update the server with new data
                     if c.UseRemoteServer and len(c.IngestUrl) > 0:
-                        report_ok = report.sendChangeReport(c.IngestUrl, c.ClientKey)
+                        report_ok = report.sendReport(c.IngestUrl, c.ClientKey)
 
                         # Check if we need to get geocode requests
                         if report_ok and (len(report.added) > 0) or (len(report.updated) > 0):

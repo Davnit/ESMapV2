@@ -15,7 +15,7 @@ class SourceUpdateReport():
     def hasChanges(self):
         return len(self.added) > 0 or len(self.expired) > 0 or len(self.updated) > 0
 
-    def getChangeData(self):
+    def getData(self):
         return {
             "source": self.source.id,
             "new": [ v.getReportData() for v in self.added.values() ],
@@ -23,8 +23,8 @@ class SourceUpdateReport():
             "updated": { k: v for k,v in self.updated.items() }
         }
 
-    def sendChangeReport(self, url, key = None):
-        data = { "calldata": json.dumps(self.getChangeData(), separators=(',',':')) }
+    def sendReport(self, url, key = None):
+        data = { "calldata": json.dumps(self.getData(), separators=(',',':')) }
 
         if key is not None and len(key) > 0:
             data["key"] = key
