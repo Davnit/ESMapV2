@@ -108,16 +108,16 @@ class GeocodeReport():
 
             if status["success"]:
                 match = True
-                if status["resolved"] != len(self.requests): match = False
+                if "resolved" in status and status["resolved"] != len(self.requests): match = False
 
                 if not match:
                     print("Reporting mismatch. Server resolved {0} locations.".format(status["resolved"]))
-                else:
-                    return True
+                    
+                return True
             else:
-                print("Report failed. Reason:", status["message"])
+                print("Geocode report failed. Reason:", status["message"])
         else:
-            print("Report submission failed. Reason:", str(response))
+            print("Geocode report submission failed. Reason:", str(response))
 
         return False
         

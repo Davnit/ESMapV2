@@ -3,13 +3,13 @@ import json, time
 
 import WebClient
 
-def getRequests(sourceUrl):
-    requests = [ ]
+open_requests = { }
 
+def getRequests(sourceUrl):
     ok, response = WebClient.openUrl(sourceUrl, { "request": 3 })
     if not ok:
         print("ERROR Unable to obtain geocode requests: " + str(response))
-        return requests     # Return no requests
+        return []     # Return no requests
     
     # Decode the returned JSON and check the response status
     data = json.loads(response)
@@ -17,22 +17,31 @@ def getRequests(sourceUrl):
     status = data["status"]
     if not status["success"]:
         print("ERROR Obtaining geocode requests: " + status["message"])
-        return requests
+        return []
 
     # Check if values were returned
     if not isinstance(data["data"], dict):
-        return requests
+        return []
 
     # Parse the returned values
     for id, location in data["data"].items():
+        if id in open_requests: continue        # Only add new requests
+
         req = GeocodeRequest(id, location)
         req.filter = { "country": [ "US" ], "administrative_area": [ "Florida", "Orange County" ] }
-        requests.append(req)
-    return requests
+        open_requests[id] = req
+
+    return open_requests.values()
 
 # Returns true if the specified config should handle geocode requests
 def canHandleRequests(config):
     return config.EnableGeocodes and len(config.DataUrl) > 0 and len(config.GeoApiUrl) > 0
+
+# Removes requests with the specified ids
+def closeRequests(requestIds):
+    for id in requestIds:
+        if id in open_requests:
+            del open_requests[id]
 
 
 class GeocodeRequest():
@@ -81,6 +90,14 @@ class GeocodeRequest():
                 return res["formatted_address"]
         return None
 
+    # Returns an error message associated with this request.
+    def getError(self):
+        if self.results is not None:
+            if "error_message" in self.results:
+                return self.results["error_message"]
+            else:
+                return self.results["status"]
+        return None
         
             
 

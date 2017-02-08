@@ -183,9 +183,17 @@
                 // Call records do not store a location, but a reference to the location (GID)
                 if (array_key_exists("location", $updates))
                 {
-                    $newGID = $geocodes[$newLocations[$cid]];
-                    if ($newGID != $current[$cid]["geoid"])
-                        $updatedValues["geoid"] = $newGID;
+                    if (array_key_exists($cid, $newLocations))
+                    {
+                        $locStr = $newLocations[$cid];
+                        if (array_key_exists($locStr, $geocodes))
+                        {
+                            $newGID = $geocodes[$locStr];
+                            if ($newGID != $current[$cid]["geoid"])
+                                $updatedValues["geoid"] = $newGID;
+                        }
+                    }
+                    
                 }
                 
                 if (array_key_exists("category", $updates))

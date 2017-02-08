@@ -91,12 +91,23 @@ while True:
         if len(requests) > 0:
             # Resolve all of the requests
             for request in requests:
-                if request.tryResolve(c.GeoApiUrl, c.GeoApiKey):
-                    print("Geocode resolved: {0} -> {1}".format(request.location, request.getFormattedAddress()))
+                if not request.resolved:
+                    if request.tryResolve(c.GeoApiUrl, c.GeoApiKey):
+                        print("Geocode resolved: {0} -> {1}".format(request.location, request.getFormattedAddress()))
+                    else:
+                        print("Geocode failed: {0} -> {1}".format(request.location, request.getError()))
 
             # Report the results
             report = Reporting.GeocodeReport(requests)
-            report.sendReport(c.IngestUrl, c.ClientKey)
+            if len(report.getData().items()) > 0:
+                if report.sendReport(c.IngestUrl, c.ClientKey):
+                    Geocoder.closeRequests(report.getData().keys())
+                else:
+                    # Save a copy of the data for analysis if needed
+                    # This is done mostly because the geocoding data sometimes triggers mod_security rules
+                    f = open('geodata.json', 'w')
+                    f.write(json.dumps(report.getData(), separators=(',',':')))
+                    f.close()
 
     time.sleep(c.TickInterval)
 
