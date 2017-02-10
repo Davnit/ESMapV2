@@ -83,7 +83,7 @@ if tableContainerId in data:
         
             results.append(row_data)
         except Exception as ex:
-            pass
+            print("Error parsing 'OCFR' index {0}: {1}".format(idx, ex))
     
 
     

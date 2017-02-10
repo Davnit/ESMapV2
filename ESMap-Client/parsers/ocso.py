@@ -64,5 +64,5 @@ for idx in range(1, len(calls)):
         # Add call to list
         results.append(row_data)
     except Exception as ex:
-        pass
+        print("Error parsing 'OCSO' index {0}: {1}".format(idx, ex))
         

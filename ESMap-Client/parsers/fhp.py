@@ -80,19 +80,16 @@ for idx in range(1, len(infoList)):
         
         results.append(row_data)
     except Exception as ex:
-        pass
+        print("Error parsing 'FHP' index {0}: {1}".format(idx, ex))
 
-try:
-    latcol = data.split("var Lat = ")[1].split("[")[1].split("];")[0].replace("\"", "").split(",")    
-    lngcol = data.split("var Lng = ")[1].split("[")[1].split("];")[0].replace("\"", "").split(",")
-    if ((len(latcol) == len(results)) and (len(lngcol) == len(results))):
-        for idx in range(0, len(results)):
-            if (not latcol[idx].startswith("0")) and (not lngcol[idx].startswith("0")):
-                results[idx]["geo_lat"] = latcol[idx]
-                results[idx]["geo_lng"] = lngcol[idx]
-                
-except Exception as ex:
-    raise ex
+# Parse source coordinate data
+latcol = data.split("var Lat = ")[1].split("[")[1].split("];")[0].replace("\"", "").split(",")    
+lngcol = data.split("var Lng = ")[1].split("[")[1].split("];")[0].replace("\"", "").split(",")
+if ((len(latcol) == len(results)) and (len(lngcol) == len(results))):
+    for idx in range(0, len(results)):
+        if (not latcol[idx].startswith("0")) and (not lngcol[idx].startswith("0")):
+            results[idx]["geo_lat"] = latcol[idx]
+            results[idx]["geo_lng"] = lngcol[idx]
 
 # Only add calls from Orange County
 results[:] = [ item for item in results if (item["meta"]["county"].upper() == "ORANGE") ]
