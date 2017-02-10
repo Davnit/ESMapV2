@@ -37,7 +37,7 @@ if c.UseRemoteServer and len(c.DataUrl) > 0:
             if isinstance(data["data"], dict):
                 # Format: data => source: { cid => [ category, location, meta ] }
                 for srcID, calls in data["data"].items():
-                    src = sources[srcID]
+                    src = sources[int(srcID)]
 
                     for cID, call in calls.items():
                         # Create a call object to represent this item
