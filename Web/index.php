@@ -52,21 +52,14 @@
                             useMapTypeControl: true,
                             
                             icons: {
-                                General: {
-                                    normal: iconBin + "default.png",
-                                },
-                                Police: {
-                                    normal: iconBin + "Police.png",
-                                },
-                                Fire: {
-                                    normal: iconBin + "Fire.png",
-                                },
-                                EMS: {
-                                    normal: iconBin + "Help.png",
-                                },
-                                Traffic: {
-                                    normal: iconBin + "Traffic.png"
-                                }
+                                Fire: { normal: iconBin + "fire.png" },
+                                FireGeneral: { normal: iconBin + "warning.png" },
+                                EMS: { normal: iconBin + "medical.png" },
+                                Patrol: { normal: iconBin + "patrol.png" },
+                                Police: { normal: iconBin + "police.png" },
+                                Hazmnat: { normal: iconBin + "biohazard.png" },
+                                Death: { normal: iconBin + "death.png" },
+                                Traffic: { normal: iconBin + "traffic.png" }
                             }
                         };
                         
