@@ -146,7 +146,7 @@ def check(source):
                     if element.upper() == find.upper():
                         found = True
                         location.append(replace)
-                        break;
+                        break
 
                 # If nothing to be replaced was found just add the element
                 if not found:
