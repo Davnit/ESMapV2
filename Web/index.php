@@ -57,7 +57,7 @@
                                 EMS: { normal: iconBin + "medical.png" },
                                 Patrol: { normal: iconBin + "patrol.png" },
                                 Police: { normal: iconBin + "police.png" },
-                                Hazmnat: { normal: iconBin + "biohazard.png" },
+                                Hazmat: { normal: iconBin + "biohazard.png" },
                                 Death: { normal: iconBin + "death.png" },
                                 Traffic: { normal: iconBin + "traffic.png" }
                             }
