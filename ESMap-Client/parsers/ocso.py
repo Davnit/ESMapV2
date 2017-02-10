@@ -36,7 +36,7 @@ for idx in range(1, len(calls)):
         call_type = "Police"
         desc = meta["description"].upper()
         
-        if "FIRE" in desc:
+        if "FIRE" in desc and not ("ASSIST" in desc):
             call_type = "Fire"
         elif "MEDICAL ONLY" in desc:
             call_type = "EMS"
