@@ -14,6 +14,11 @@ replacements.update({
     "GREENWAY": "FL-417", "GREENEWAY": "FL-417"
 })
 
+types = {
+    "Police": [ "SILVER ALERT", "AMBER ALERT", "ROCK THROWING", "MISSING PERSON", "POSSIBLE FATALITY" ],
+    "Death": [ "SUICIDE", "FATALITY" ]
+}
+
 infoList = data.split("<input type=\"hidden\" id=\"popInfo")    
 for idx in range(1, len(infoList)):
     try:
@@ -42,10 +47,14 @@ for idx in range(1, len(infoList)):
         meta["description"]   = getRowValue(info, "Incident Type")
         
         call_type = "Traffic"
-        if ("SILVER ALERT" in meta["description"] or "Amber Alert" in meta["description"]):
-            call_type = "Police"
-        elif meta["description"].startswith("FIRE"):
+        desc = meta["description"].upper()
+        if desc.startswith("FIRE"):
             call_type = "Fire"
+        else:
+            for sType, termList in types.items():
+                for term in termList:
+                    if term in desc:
+                        call_type = sType
             
         # Make a rough parse of the location string
         #   This source is pretty good about providing its own geocodes but this is just in case.

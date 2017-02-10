@@ -40,10 +40,12 @@ for idx in range(1, len(calls)):
             call_type = "Fire"
         elif "MEDICAL ONLY" in desc:
             call_type = "EMS"
-        elif ("TRAFFIC" in desc) or (desc == "VEHICLE ACCIDENT") or (desc == "OBSTRUCT ON HWY"):
+        elif ("TRAFFIC" in desc) or desc in [ "VEHICLE ACCIDENT", "OBSTRUCT ON HWY" ]:
             call_type = "Traffic"
         elif ("PATROL" in desc) or (desc == "HOUSE/BUS./AREA/CHECK"):
-            call_type = "Patrol"    
+            call_type = "Patrol"
+        elif desc in [ "MAN DOWN", "DEAD PERSON", "DROWNING", "MURDER" ]:
+            call_type = "Death"
         
         # Determine location string to geocode
         location = meta["location"].strip()

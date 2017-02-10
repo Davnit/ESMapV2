@@ -13,6 +13,13 @@ replacements.update({
     "TURNPIKE": "FLORIDA TURNPIKE", "TPK": "FLORIDA TURNPIKE", 
     "GREENWAY": "FL-417", "GREENEWAY": "FL-417"
 })
+
+types = { 
+    "Traffic": [ "HIT AND RUN", "ON HIGHWAY", "SIGNAL OUT", "TRAFFIC" ],
+    "Patrol": [ "HOUSE/BUSINESS CHECK", "PATROL" ],
+    "Death": [ "MAN DOWN", "DEAD PERSON", "SUICIDE", "MURDER" ],
+    "Fire": [ "FIRE" ]
+}
     
 calls = data.split("<CALL ")
 for idx in range(1, len(calls)):
@@ -35,12 +42,14 @@ for idx in range(1, len(calls)):
         call_type = "Police"
         desc = meta["description"].upper()
         
-        if "FIRE" in desc:
-            call_type = "Fire"
-        elif ("ACCIDENT" in desc) or ("HIT AND RUN" in desc):
+        if desc.startswith("ACCIDENT"):
+            # This special case avoids 'airplane accident' and 'industrial accident'
             call_type = "Traffic"
-        elif desc == "HOUSE/BUSINESS CHECK":
-            call_type = "Patrol"
+        else:
+            for sType, termList in types.items():
+                for term in termList:
+                    if term in desc:
+                        call_type = sType
             
         # Determine location string to geocode
         location = meta["location"]

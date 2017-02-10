@@ -60,12 +60,14 @@ if tableContainerId in data:
             meta["location"] = locStr
             
             ct = meta["call_type"].upper()
-            if ct in [ "FIRE", "TRAFFIC" ]:
+            if "FIRE" in ct:
+                ct = "Fire"
+            elif ct in [ "TRAFFIC", "HAZMAT" ]:
                 ct = ct.title()
             elif ct == "EMS":
                 ct = ct
             else:
-                ct = "General"
+                ct = "Fire-General"
 
             locStr = locStr.replace(" N/A", "").replace("STATE ROAD ", "FL-").replace("/", " AND ")
                 
