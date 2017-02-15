@@ -69,7 +69,8 @@ if tableContainerId in data:
             else:
                 ct = "Fire-General"
 
-            locStr = locStr.replace(" N/A", "").replace("STATE ROAD ", "FL-").replace("/", " AND ")
+            locStr = locStr.replace("STATE ROAD ", "FL-").replace("EAST WEST", "FL-408")
+            locStr = locStr.replace(" N/A", "").replace("/", " AND ")
                 
             row_data["key"] = "OCFR-" + meta["call_number"]
             row_data["location"] = locStr
