@@ -71,6 +71,10 @@ if tableContainerId in data:
 
             locStr = locStr.replace("STATE ROAD ", "FL-").replace("EAST WEST", "FL-408")
             locStr = locStr.replace(" N/A", "").replace("/", " AND ")
+            if not ("/" in locStr) and ("I4" in locStr or "FL-" in locStr) and locStr.endswith("EX"):
+                splt = locStr.split(" ", 1)
+                locStr = splt[1] + " " + splt[0]
+                locStr = locStr.replace("EX", "EXIT")
                 
             row_data["key"] = "OCFR-" + meta["call_number"]
             row_data["location"] = locStr
@@ -78,7 +82,7 @@ if tableContainerId in data:
             row_data["meta"] = meta
     
             geo = r.split("MAPBUTTON")[1].split("latlng=")[1].split("\">")[0].split(",")
-            if verifyGeo(geo[0], geo[1]):
+            if verifyGeo(geo[0], geo[1]) and not ("EXIT" in locStr):
                 row_data["geo_lat"] = geo[0]
                 row_data["geo_lng"] = geo[1]
         
