@@ -53,7 +53,7 @@ class SourceUpdateReport():
             else:
                 print("Report failed. Reason: " + status["message"])
         else:
-            print("Report submission failed. Reason: " + response)
+            print("Report submission failed. Reason:", str(response))
 
         # default fail
         return False
