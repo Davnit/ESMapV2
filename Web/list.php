@@ -5,15 +5,15 @@
 ?><html>
     <head>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
-        <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
         <script type="text/javascript">
             var lastUpdate = null;
             var table = null;
             
             var IDList = {}
             
-            google.load("visualization", "1", { packages: [ "table" ] });
-            google.setOnLoadCallback(startup);
+            google.charts.load("current", { "packages": [ "table" ] });
+            google.charts.setOnLoadCallback(startup);
             
             function startup() {
                 table = new google.visualization.Table(document.getElementById("table"));

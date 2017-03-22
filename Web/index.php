@@ -5,14 +5,14 @@
 ?><html>
     <head>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
-        <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
         <script type="text/javascript">
             var lastUpdate = null;
             var timerID = null;
             var map = null;
             
-            google.load("visualization", "1", { packages: [ "map" ] });
-            google.setOnLoadCallback(startup);
+            google.charts.load("current", { "packages": [ "map" ] });
+            google.charts.setOnLoadCallback(startup);
             
             function startup() {
                 var mapDiv = document.getElementById("map");
@@ -46,7 +46,8 @@
                         var iconBin = "<?php echo $config["icon_bin"]; ?>";
                         
                         var options = {
-                            showTip: true, 
+                            showTooltip: false,
+                            showInfoWindow: true,
                             enableScrollWheel: true, 
                             mapType: "normal",
                             useMapTypeControl: true,
