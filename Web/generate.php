@@ -47,7 +47,6 @@
         $sql .= " OR (c.expired >= NOW() - INTERVAL $historyTime)";
     }
     
-    
     $callList = getData($sql);
     
     // Organize data to be written
@@ -59,6 +58,10 @@
         $src = intval($cL["source"]);
         $meta = json_decode($cL["meta"], true);
         
+        // Do we recognize this source? If not, skip it.
+        if (array_key_exists($src, $sources) === false)
+            continue;
+        
         // The live map should only contain calls that have resolved coordinates.
         if (($cL["latitude"] != null) and ($cL["longitude"] != null))
         {
@@ -68,18 +71,15 @@
             $fLng = floatval($cL["longitude"]);
             
             // Check if the source of this call has a defined boundary
-            if (array_key_exists($src, $sources))
+            $bounds = $sources[$src]["bounds"];
+            
+            if (count($bounds) == 4)
             {
-                $bounds = $sources[$src]["bounds"];
-                
-                if (count($bounds) == 4)
+                // Check if the point is outside of the bounds
+                //   [ne_lat, ne_lng, sw_lat, sw_lng]
+                if ($fLat > $bounds[0] and $fLng > $bounds[1] and $fLat < $bounds[2] and $fLng < $bounds[3])
                 {
-                    // Check if the point is outside of the bounds
-                    //   [ne_lat, ne_lng, sw_lat, sw_lng]
-                    if ($fLat > $bounds[0] and $fLng > $bounds[1] and $fLat < $bounds[2] and $fLng < $bounds[3])
-                    {
-                        $verified = false;
-                    }
+                    $verified = false;
                 }
             }
             
