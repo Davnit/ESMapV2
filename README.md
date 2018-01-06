@@ -1,5 +1,4 @@
 # ESMapV2
-This system was designed to monitor police activity through publicly available dispatch logs. It takes the location information from these logs and displays it on a map, making relevant calls easier to find. It was expanded to include fire department and highway patrol calls.
+This system was designed to monitor police activity and fire rescue calls in Orange County Florida through publicly available dispatch logs. It takes the location information from these logs, geocodes it, and displays the locations on a map, making relevant calls easier to find. 
 
-The older implementation of this system can be found live [here](http://davnit.net/esmap). 
-The current dev implementation of the new system can be found [here](http://davnit.net/esmap2).
+A live implementation of this system can be found [here](http://davnit.net/esmap). 
