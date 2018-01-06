@@ -30,9 +30,7 @@
                     if (lastUpdate == null || updateTime > lastUpdate) {
                         lastUpdate = updateTime;
                         
-                        var data = [
-                            [ "Source", "Description", "Location", "Call Time", "Closed" ]
-                        ];
+                        var data = [];
                         
                         var counter = 0;
                         for (var id in obj.calls) {
@@ -43,6 +41,11 @@
                             IDList[counter] = id;
                             counter++;
                         }
+                        
+                        // Add the header last and reverse the table.
+                        //   This changes the default order in which calls are shown. Latest first.
+                        data.push([ "Source", "Description", "Location", "Call Time", "Closed" ]);
+                        data = data.reverse();
                         
                         var options = {
                             showRowNumber: false,
