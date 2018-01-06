@@ -42,6 +42,10 @@ def closeRequests(requestIds):
     for id in requestIds:
         if id in open_requests:
             del open_requests[id]
+			
+def unicodeReplace(str):
+	str = str.replace('\u2013', '-')
+	return str
 
 
 class GeocodeRequest():
@@ -87,7 +91,7 @@ class GeocodeRequest():
         if len(resultList) > 0:
             res = resultList[0]
             if "formatted_address" in res:
-                return res["formatted_address"]
+                return unicodeReplace(res["formatted_address"])
         return None
 
     # Returns an error message associated with this request.
