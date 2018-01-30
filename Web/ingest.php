@@ -212,14 +212,11 @@
                     // Iterate each value being changed
                     foreach ($updates["meta"] as $key => $newValue)
                     {
-                        if (array_key_exists($key, $currentMeta))
+                        // Verify the new value is different
+                        if (!array_key_exists($key, $currentMeta) || $currentMeta[$key] != $newValue)
                         {
-                            // Verify the new value is different
-                            if ($currentMeta[$key] != $newValue)
-                            {
-                                $metaChanged = true;
-                                $currentMeta[$key] = $newValue;     # Update value
-                            }
+                            $metaChanged = true;
+                            $currentMeta[$key] = $newValue;     # Update value
                         }
                     }
                     
