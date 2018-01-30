@@ -186,7 +186,7 @@
                     if (array_key_exists($cid, $newLocations))
                     {
                         $locStr = $newLocations[$cid];
-                        if (array_key_exists($locStr, $geocodes))
+                        if (is_string($locStr) && array_key_exists($locStr, $geocodes))
                         {
                             $newGID = $geocodes[$locStr];
                             if ($newGID != $current[$cid]["geoid"])
@@ -207,7 +207,7 @@
                 if (array_key_exists("meta", $updates))
                 {
                     $metaChanged = false;
-                    $currentMeta = json_decode($current[$cid]["meta"], true);
+                    $currentMeta = json_decode($current[$cid]["meta"], true) ?? array();
                     
                     // Iterate each value being changed
                     foreach ($updates["meta"] as $key => $newValue)
