@@ -10,7 +10,7 @@
             var lastUpdate = null;
             var table = null;
             
-            var IDList = {}
+            var IDList = {};
             
             google.charts.load("current", { "packages": [ "table" ] });
             google.charts.setOnLoadCallback(startup);
@@ -62,7 +62,7 @@
                 if (selection.length > 0) {
                     var row = selection[0].row;
                     if (row in IDList) {
-                        window.location.href = "call.php?id=" + IDList[row];
+                        window.location.href = "call.php?id=" + IDList[(Object.keys(IDList).length - 1) - row];
                     }
                 }
             }
