@@ -61,8 +61,6 @@ if c.UseRemoteServer and len(c.DataUrl) > 0:
 
 # Run
 while True:
-    shouldGeocode = False       # Determines if we should get geocode requests this cycle
-
     # Iterate the data sources and check the ones that need updating
     for src in sources.values():
         if Sources.needsUpdate(src) and Sources.canCheck(src):
@@ -81,14 +79,11 @@ while True:
 
                     # Update the server with new data
                     if c.UseRemoteServer and len(c.IngestUrl) > 0:
-                        report_ok = report.sendReport(c.IngestUrl, c.ClientKey)
+                        report.sendReport(c.IngestUrl, c.ClientKey)
 
-                        # Check if we need to get geocode requests
-                        if report_ok and (len(report.added) > 0) or (len(report.updated) > 0):
-                            shouldGeocode = True                        
 
     # Handle geocode requests
-    if Geocoder.canHandleRequests(c) and shouldGeocode:
+    if Geocoder.canHandleRequests(c):
         requests = Geocoder.getRequests(c.DataUrl)
 
         if len(requests) > 0:
