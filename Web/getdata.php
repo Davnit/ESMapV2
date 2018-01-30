@@ -46,7 +46,7 @@
     switch ($request)
     {
         case 1:     # Source assignments
-            $data = getData("SELECT id, tag, url, parser, update_time FROM sources");
+            $data = getData("SELECT id, tag, url, parser, update_time FROM sources ORDER BY id");
             
             $sources = array();
             foreach ($data as $d)
