@@ -76,8 +76,8 @@
             if (count($bounds) == 4)
             {
                 // Check if the point is outside of the bounds
-                //   [ne_lat, ne_lng, sw_lat, sw_lng]
-                if ($fLat > $bounds[0] and $fLng > $bounds[1] and $fLat < $bounds[2] and $fLng < $bounds[3])
+                //   [sw_lat, sw_lng, ne_lat, ne_lng]
+                if ($fLat < $bounds[0] or $fLng < $bounds[1] or $fLat > $bounds[2] or $fLng > $bounds[3])
                 {
                     $verified = false;
                 }
