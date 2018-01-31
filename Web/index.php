@@ -39,8 +39,11 @@
                             [ "Latitude", "Longitude", "Description", "Marker" ]
                         ];
                         
-                        for (i = 0; i < obj.calls.length; i++) {
-                            data.push(obj.calls[i]);
+                        for (var id in obj.calls) {
+                            item = obj.calls[id];
+                            item[2] = '<a href="./call.php?id=' + id + '">' + item[2] + '</a>';
+                            
+                            data.push(item);
                         }
                     
                         var iconBin = "<?php echo $config["icon_bin"]; ?>";

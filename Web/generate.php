@@ -92,7 +92,7 @@
                 
                 // Add the point to the map list
                 //   Format: [ latitude, longitude, tooltip, marker ]
-                $mapCalls[] = array($fLat, $fLng, $tooltip, str_replace("-", "", $cL["category"]));
+                $mapCalls[$id] = array($fLat, $fLng, $tooltip, str_replace("-", "", $cL["category"]));
             }
         }
         
