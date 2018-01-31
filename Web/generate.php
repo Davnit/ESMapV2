@@ -117,6 +117,10 @@
         $tableCalls[$id] = array($src, $meta["description"], $meta["location"], $callTime, $expired);
     }
     
+    // Set serialization precision for floating point numbers
+    //   This makes it so that our coordinates aren't serialized with a bunch of useless junk after them.
+    ini_set("serialize_precision", -1);
+    
     // Create the object for the live map and serialize it
     $obj = array(
         "updated" => time(),
