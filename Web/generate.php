@@ -104,8 +104,8 @@
         // Convert times to the source's time zone
         if ($timezone != null)
         {
-            $added = convertTimeZone($added, $timezone);
-            $expired = convertTimeZone($expired, $timezone);
+            //$added = convertTimeZone($added, $timezone);
+            //$expired = convertTimeZone($expired, $timezone);
         }
         
         // Determine the call's start time. If the source specified a time, use that, otherwise
