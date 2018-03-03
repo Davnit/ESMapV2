@@ -113,7 +113,7 @@ class GeocodeRequest():
     def getError(self):
         if self.results is not None:
             if "error_message" in self.results:
-                return self.results["error_message"]
+                return self.results["status"] + ": " + self.results["error_message"]
             else:
                 return self.results["status"]
         return None
