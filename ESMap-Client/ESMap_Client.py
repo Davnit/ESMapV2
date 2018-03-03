@@ -89,7 +89,7 @@ while True:
         if len(requests) > 0:
             # Resolve all of the requests
             for request in requests:
-                if not request.resolved:
+                if not request.resolved and not Geocoder.quota_exceeded:
                     if request.tryResolve(c.GeoApiUrl, c.GeoApiKey):
                         print("Geocode resolved: {0} -> {1}".format(request.location, request.getFormattedAddress()))
                     else:

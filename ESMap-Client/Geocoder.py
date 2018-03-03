@@ -1,9 +1,12 @@
 
 import json, time
+from datetime import datetime
 
 import WebClient
 
 open_requests = { }
+quota_exceeded = False
+last_api_call = None
 
 def getRequests(sourceUrl):
     ok, response = WebClient.openUrl(sourceUrl, { "request": 3 })
@@ -35,14 +38,21 @@ def getRequests(sourceUrl):
 
 # Returns true if the specified config should handle geocode requests
 def canHandleRequests(config):
-    return config.EnableGeocodes and len(config.DataUrl) > 0 and len(config.GeoApiUrl) > 0
+    global quota_exceeded
+    if not config.EnableGeocodes or len(config.DataUrl) == 0 or len(config.GeoApiUrl) == 0:
+        return False
+    else:
+        if quota_exceeded:
+            quota_exceeded = (last_api_call is not None) and ((datetime.now() - last_api_call).seconds < (3600))
+            return not quota_exceeded
+        return True
 
 # Removes requests with the specified ids
 def closeRequests(requestIds):
     for id in requestIds:
         if id in open_requests:
             del open_requests[id]
-			
+
 def unicodeReplace(str):
 	str = str.replace('\u2013', '-')
 	return str
@@ -58,6 +68,7 @@ class GeocodeRequest():
 
     # Attempts to resolve the request
     def tryResolve(self, apiUrl, clientKey = None):
+        global quota_exceeded, last_api_call
 
         # Build request parameters
         params = { "address": self.location }
@@ -77,10 +88,14 @@ class GeocodeRequest():
         ok, response = WebClient.openUrl(apiUrl, params)
         if not ok: return False
 
+        last_api_call = datetime.now()
+
         # Parse results
         self.results = json.loads(response)
         if self.results["status"] in [ "OK", "ZERO_RESULTS" ]:
             self.resolved = True
+        elif self.results["status"] == "OVER_QUERY_LIMIT":
+            quota_exceeded = True
         return self.resolved
 
     # Gets a properly formatted address as returned by the geocode API
