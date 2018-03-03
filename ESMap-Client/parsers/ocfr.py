@@ -5,7 +5,17 @@
 '''
     
 def tdsplit(tr, s):
-    return tr.split(s)[1].split(">", 1)[1].split("</")[0].strip()
+    x = tr.split(s)
+    if len(x) > 1:
+        x = x[1].split(">", 1)
+        if len(x) > 1:
+            x = x[1].split("</")
+        else:
+            return None
+    else:
+        return None
+    
+    return x[0].strip()
     
 # This source has been flaky with their geocodes. They only use a bounds suggestion so
 #   occasionally things are resolved outside of the desired bounds.
@@ -50,9 +60,14 @@ if tableContainerId in data:
             meta = { }
             meta["call_number"] = tdsplit(r, "CALL_NO")
             meta["call_time"]   = tdsplit(r, "DISPATCH_TIME")
-            meta["description"] = tdsplit(r, "CALL_DESCRIPTION").replace("  ", " ")
+            meta["description"] = tdsplit(r, "CALL_DESCRIPTION")
             meta["call_type"]   = tdsplit(r, "CALL_TYPE")
             meta["unit"]        = tdsplit(r, "UNITLabel")
+            
+            if meta["description"] is None:
+                meta["description"] = meta["call_type"]
+                
+            meta["description"] = meta["description"].replace("  ", " ")
             
             locStr = tdsplit(r, "STREET_NAME")
             if not ("/" in locStr.replace(" N/A", "")):
