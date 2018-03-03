@@ -75,7 +75,7 @@
             break;
             
         case 3:     # Geocode requests
-            $data = getData("SELECT id, location FROM geocodes WHERE results IS NULL AND latitude IS NULL AND longitude IS NULL LIMIT 20");
+            $data = getData("SELECT id, location FROM geocodes WHERE results IS NULL AND latitude IS NULL AND longitude IS NULL ORDER BY id DESC LIMIT 20");
             
             $geo = array();
             foreach ($data as $d)
