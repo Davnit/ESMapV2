@@ -47,7 +47,6 @@ tableContainerId = "lstvwCalls4Svc_itemPlaceholderContainer"
 
 # All call data is contained in an HTML table.
 if tableContainerId in data:
-    table = data.split(tableContainerId)[1].split("</table>")[0]
     
     # Skip split[0] (pre-first row) and [1] (header row)
     rows = table.split("<tr")
@@ -105,5 +104,6 @@ if tableContainerId in data:
         except Exception as ex:
             print("Error parsing 'OCFR' index {0}: {1}".format(idx, ex))
     
-
+else:
+    print("Error parsing 'OCFR': data table not found")
     
