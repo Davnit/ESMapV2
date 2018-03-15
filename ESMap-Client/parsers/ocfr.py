@@ -47,6 +47,7 @@ tableContainerId = "lstvwCalls4Svc_itemPlaceholderContainer"
 
 # All call data is contained in an HTML table.
 if tableContainerId in data:
+    table = data.split(tableContainerId)[3].split("</table>")[0]
     
     # Skip split[0] (pre-first row) and [1] (header row)
     rows = table.split("<tr")
