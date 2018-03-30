@@ -103,9 +103,12 @@ while True:
                 else:
                     # Save a copy of the data for analysis if needed
                     # This is done mostly because the geocoding data sometimes triggers mod_security rules
-                    f = open('geodata.json', 'w')
-                    f.write(json.dumps(report.getData(), separators=(',',':')))
-                    f.close()
+                    try:
+                        with open('geodata.json', 'w') as f:
+                            f.write(json.dumps(report.getData(), separators=(',',':')))
+                            f.close()
+                    except Exception as ex:
+                        print("Error writing geodata: ", ex)
 
     time.sleep(c.TickInterval)
 
