@@ -12,27 +12,23 @@ def getRequests(sourceUrl):
     ok, response = WebClient.openUrl(sourceUrl, { "request": 3 })
     if not ok:
         print("ERROR Unable to obtain geocode requests: " + str(response))
-        return []     # Return no requests
+    else:
+        # Decode the returned JSON and check the response status
+        data = json.loads(response)
     
-    # Decode the returned JSON and check the response status
-    data = json.loads(response)
-    
-    status = data["status"]
-    if not status["success"]:
-        print("ERROR Obtaining geocode requests: " + status["message"])
-        return []
+        status = data["status"]
+        if not status["success"]:
+            print("ERROR Obtaining geocode requests: " + status["message"])
+        else:
+            # Check if values were returned
+            if isinstance(data["data"], dict):
+                # Parse the returned values
+                for id, location in data["data"].items():
+                    if id in open_requests: continue        # Only add new requests
 
-    # Check if values were returned
-    if not isinstance(data["data"], dict):
-        return []
-
-    # Parse the returned values
-    for id, location in data["data"].items():
-        if id in open_requests: continue        # Only add new requests
-
-        req = GeocodeRequest(id, location)
-        req.filter = { "country": [ "US" ], "administrative_area": [ "Florida", "Orange County" ] }
-        open_requests[id] = req
+                    req = GeocodeRequest(id, location)
+                    req.filter = { "country": [ "US" ], "administrative_area": [ "Florida", "Orange County" ] }
+                    open_requests[id] = req
 
     return open_requests.values()
 
