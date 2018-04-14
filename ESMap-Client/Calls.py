@@ -56,6 +56,11 @@ def compare(a, b):
         else:
             if v != repA[k]:
                 diff[k] = v
+
+    # If the parsed location has changed but the meta location hasn't, then it doesn't count.
+    #  This fixes the mismatches when syncing to the server.
+    if "location" in diff and ((not "meta" in diff) or (not "location" in diff["meta"])):
+        del diff["location"];
     
     return diff
     
