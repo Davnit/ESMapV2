@@ -16,7 +16,7 @@
         return $statement->fetchAll(PDO::FETCH_ASSOC);
     }
     
-    function insertRows($table, $fields, $data, $ignoreDuplicates = false)
+    function insertRows($table, $fields, $data, $handleDuplicates = false)
     {
         global $db;
         
@@ -43,9 +43,9 @@
         
         // Build the query
         $sql = sprintf("INSERT INTO %s (%s) VALUES %s", $table, implode(",", $fields), implode(",", $rows));
-        if ($ignoreDuplicates)
+        if ($handleDuplicates !== false)
         {
-            $sql .= " ON DUPLICATE KEY UPDATE " . $fields[0] . "=" . $fields[0];
+            $sql .= " ON DUPLICATE KEY " . $handleDuplicates;
         }
         
         $statement = $db->prepare($sql);

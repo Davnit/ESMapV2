@@ -14,6 +14,36 @@
         die(json_encode($response));
     }
     
+    // Inserts locations and (optional) latitude/longitude to geocoding table.
+    //  Returns location => geoID for each entry. If no locations are given, returns an empty array.
+    //  Locations array must have 3 columns [ location, latitude, longitude ]. Use null.
+    function getGeoData($locations)
+    {
+        if (count($locations) == 0) return array();
+        
+        // Attempt to insert all of these locations into the database
+        //   Ignore duplicates (so that we link the new entries to old resolves)
+        //   Inserts pre-resolved coordinates and merges with existing data
+        $fields = [ "location", "latitude", "longitude" ];
+        insertRows("geocodes", $fields, $locations, "UPDATE $fields[0] = $fields[0]");
+        
+        // Get rid of everything except the location strings
+        $locations = array_column($locations, "location");
+        
+        // Get geocode IDs for locations
+        $sql = "SELECT id, location FROM geocodes WHERE location IN (%s)";
+        $sql = sprintf($sql, implode(",", array_fill(0, count($locations), "?")));
+        
+        $geocodes = getData($sql, $locations);
+        if (count($geocodes) > 0)
+        {
+            // location -> geoid
+            return array_column($geocodes, "id", "location");
+        }
+        else
+            return array();
+    }
+    
     if (!isset($_POST["calldata"]) and !isset($_POST["geodata"])) {
         reportError("No data provided.");
     }
@@ -63,11 +93,13 @@
             $locations = array();   // Locations of new calls
         
             // Format new call data as rows for the table
+            //   key => [ source, key, category, geoID, metadata ]
             foreach ($data["new"] as $row)
             {
                 $calls[$row["key"]] = [ $source, $row["key"], $row["category"], null, json_encode($row["meta"]) ];
                 
-                // Extract coordinates, if supplied.
+                // Get fixed size location data array 
+                //  [ location, latitude, longitude ]
                 $locData = extractLocationData($row);
                 if ($locData !== null)
                 {
@@ -85,6 +117,7 @@
                             continue;
                     }
                     
+                    // match calls to location data
                     $locations[$row["key"]] = $locData;
                 }
             }
@@ -92,35 +125,25 @@
             // Add new locations to geocode table
             if (count($locations) > 0)
             {
-                insertRows("geocodes", [ "location", "latitude", "longitude" ], $locations, true);
-                
-                // Trim locations down to just the location string (no more coordinates)
+                // location -> geoID
+                $geocodes = getGeoData($locations);
+            
+                // Trim down to just key => location
                 $locations = array_map(function ($x) { return $x["location"]; }, $locations);
                 
-                // Get geocode IDs for new calls
-                $sql = "SELECT id, location FROM geocodes WHERE location IN (%s)";
-                $sql = sprintf($sql, implode(",", array_fill(0, count($locations), "?")));
-        
-                $geocodes = getData($sql, array_values($locations));
-                if (count($geocodes) > 0)
+                // Map calls to the geoID for their locations.
+                foreach ($locations as $k => $v)
                 {
-                    // location -> geoid
-                    $geocodes = array_column($geocodes, "id", "location");
-            
-                    // Add geoid to calls
-                    foreach ($locations as $k => $v)
-                    {
-                        $calls[$k][3] = $geocodes[$v];
-                    }
+                    $calls[$k][3] = $geocodes[$v];
                 }
             }
         
-            // Add new calls
+            // Add new calls - if a call ID is already there, reopen it.
             $fields = [ "source", "cid", "category", "geoid", "meta" ];
-            $newCount = insertRows("calls", $fields, $calls, true);
+            $newCount = insertRows("calls", $fields, $calls, "UPDATE expired = NULL");
         }
     
-        // Update expired calls
+        // Close expired calls (sets expired timestamp to now())
         if (count($data["expired"]) > 0) 
         {
             $expCount = updateTimestamps("calls", "expired", "cid", $data["expired"]);
@@ -132,10 +155,11 @@
             // Get updated call IDs
             $updateCIDs = array_keys($data["updated"]);
             
-            // Get list of new locations
+            // Get list of updated locations
             $newLocations = array();
             foreach ($data["updated"] as $cid => $row)
             {
+                // [ location, latitude, longitude ]
                 $locData = extractLocationData($row);
                 if ($locData != null)
                 {
@@ -151,16 +175,11 @@
             
             if (count($newLocations) > 0)
             {
-                // Try to insert new locations
-                insertRows("geocodes", [ "location", "latitude", "longitude" ], $newLocations, true);
+                // location -> geoID
+                $geocodes = getGeoData($newLocations);
+                
+                // Trim locations to just key => location
                 $newLocations = array_map(function ($x) { return $x["location"]; }, $newLocations);
-                
-                // Retreive IDs for new locations
-                $sql = "SELECT id, location FROM geocodes WHERE location IN (%s)";
-                $sql = sprintf($sql, implode(",", array_fill(0, count($newLocations), "?")));
-                $geocodes = getData($sql, array_values($newLocations));
-                
-                $geocodes = array_column($geocodes, "id", "location");
             }
             
             // Retrieve existing call data
