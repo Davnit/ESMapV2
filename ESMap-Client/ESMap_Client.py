@@ -1,33 +1,20 @@
 
 import time, sys, json
+from datetime import datetime
 import ClientConfig, Sources, Calls, WebClient, Reporting, Geocoder
 
-# Startup
-print("Loading config...")
-c = ClientConfig.load()
-ClientConfig.save(c)        # This writes default values of new settings
+# syncs current data with remote server
+#  returns: sources, active_calls
+def resync():
+    if not c.UseRemoteServer or len(c.DataUrl) == 0:
+        raise Exception("Cannot resync when using local data.")
 
-print("Obtaining sources...")
-sources = None
-if c.UseRemoteServer:
-    sources = Sources.getRemoteSources(c.DataUrl)
-else:
-    sources = Sources.getLocalSources(c.SourceLocation)
-
-if len(sources) == 0:
-    print("No sources found.")
-    sys.exit()
-
-active_calls = { }
-
-for src in sources.values():
-    print("Source #{0}: {1} => {2} [Can check?: {3}]".format(src.id, src.tag, src.parser, Sources.canCheck(src)))
-    active_calls[src.id] = [ ]
-
-# Sync
-if c.UseRemoteServer and len(c.DataUrl) > 0:
     print("Syncing with server: {0}".format(c.DataUrl.split("://")[1].split("/")[0]))
 
+    sources = Sources.getRemoteSources(c.DataUrl)
+    active = { }
+
+    # Get current call list from server
     ok, response = WebClient.openUrl(c.DataUrl, { "request": 2 })
     if ok:
         data = json.loads(response)
@@ -41,6 +28,7 @@ if c.UseRemoteServer and len(c.DataUrl) > 0:
                     if not isrc in sources: continue
                     
                     src = sources[isrc]
+                    active[src.id] = [ ]
 
                     for cID, call in calls.items():
                         # Create a call object to represent this item
@@ -50,17 +38,50 @@ if c.UseRemoteServer and len(c.DataUrl) > 0:
                         callObj.key = cID
                         callObj.source = src
             
-                        active_calls[src.id].append(callObj)
+                        active[src.id].append(callObj)
                         print("\t{0}: {1}".format(src.tag, callObj.getShortDisplayString()))
             else:
                 print("\t... No calls active.")
+
         else:
             print("\t...", status["message"])
     else:
         print("\t... failed: " + str(response))
 
+    return sources, active
+
+# Startup
+print("Loading config...")
+c = ClientConfig.load()
+ClientConfig.save(c)        # This writes default values of new settings
+
+# Get initial data
+if c.UseRemoteServer:
+    sources, active_calls = resync()
+    last_sync = datetime.now()
+else:
+    sources = Sources.getLocalSources(c.SourceLocation)
+    active_calls = { }
+
+# Can't do anything without sources
+if len(sources) == 0:
+    print("No sources found.")
+    sys.exit()
+
+# List source info and initialize call lists
+for src in sources.values():
+    print("Source #{0}: {1} => {2} [Can check?: {3}]".format(src.id, src.tag, src.parser, Sources.canCheck(src)))
+    if not src.id in active_calls:
+        active_calls[src.id] = [ ]
+
 # Run
 while True:
+    # should we resync?
+    if c.UseRemoteServer and c.SyncTime != 0:
+        if (last_sync == None or (datetime.now() - last_sync).seconds >= c.SyncTime):
+            sources, active_calls = resync()
+            last_sync = datetime.now()
+
     # Iterate the data sources and check the ones that need updating
     for src in sources.values():
         if Sources.needsUpdate(src) and Sources.canCheck(src):

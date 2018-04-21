@@ -29,6 +29,7 @@ def save(c, configPath=None):
     p.set("MAIN", "tick_interval", str(c.TickInterval))
     p.set("MAIN", "use_remote", str(c.UseRemoteServer))
     p.set("MAIN", "client_key", str(c.ClientKey))
+    p.set("MAIN", "sync_time", str(c.SyncTime))
 
     p.add_section("PATHS")
     p.set("PATHS", "sources", c.SourceLocation)
@@ -50,7 +51,8 @@ class Config():
     def __init__(self, p):
         self.TickInterval = int(p.get("MAIN", "tick_interval", fallback="60"))           # Time to wait between checking if sources need to be updated
         self.UseRemoteServer = parseBool(p.get("MAIN", "use_remote", fallback="False"))  # Should the client sync with a remote server?
-        self.ClientKey = p.get("MAIN", "client_key", fallback="")                        # Key used to access the remote server     
+        self.ClientKey = p.get("MAIN", "client_key", fallback="")                        # Key used to access the remote server
+        self.SyncTime = int(p.get("MAIN", "sync_time", fallback="3600"))                 # How often to resync with the server (in seconds), 0 = never
 
         self.SourceLocation = p.get("PATHS", "sources", fallback="sources.txt")          # Location to obtain sources from (local only, otherwise DataUrl is used)
         self.IngestUrl = p.get("PATHS", "ingest", fallback="")                           # URL to report new data to
