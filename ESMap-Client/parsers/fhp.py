@@ -22,23 +22,24 @@ for incident in dataObj["features"]:
         else:
             city = ""
         
+        # Use the dispatch or arrival time for the call time, if specified.
+        call_time = attr["DATE"].strip()
+        if len(attr["DISPATCHTIME"]) > 0:
+            call_time = call_time + " " + attr["DISPATCHTIME"]
+        elif len(attr["ARRIVETIME"]) > 0:
+            call_time = call_time + " " + attr["ARRIVETIME"]
+        
         meta = {
             "call_number": attr["INCIDENTID"],
-            "call_date": attr["DATE"],
+            "call_time" if ":" in call_time else "call_date": call_time,
             "dispatched": attr["DISPATCHTIME"],
             "arrived": attr["ARRIVETIME"],
             "location": loc[0].replace("  ", " ").strip(),
             "county": attr["COUNTY"].title(),
             "city": city,
-            "remarks": attr["REMARKS"],
-            "description": desc
+            "description": desc.title().replace("W/", "w/"),
+            "remarks": attr["REMARKS"]
         }
-        
-        # Use the dispatch or arrival time for the call time, if specified.
-        if len(meta["dispatched"]) > 0:
-            meta["call_time"] = meta["call_date"] + " " + meta["dispatched"]
-        elif len(meta["arrived"]) > 0:
-            meta["call_time"] = meta["call_date"] + " " + meta["arrived"]
         
         location = meta["location"]
         if " x[" in location:
@@ -79,8 +80,6 @@ for incident in dataObj["features"]:
             "geo_lng": attr["LON"],
             "meta": meta
         }
-        
-         
         
         results.append(row_data)
     except Exception as ex:

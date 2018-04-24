@@ -26,7 +26,7 @@ for idx in range(1, len(calls)):
         meta["sector"]              = getValue(call, "SECTOR")
         meta["zone"]                = getValue(call, "ZONE")
         meta["district"]            = getValue(call, "RD")
-        meta["description"]         = getValue(call, "DESC")
+        meta["description"]         = getValue(call, "DESC").title()
         
         # OCSO doesn't provide unique call numbers so we need to come up with our own semi-unique key
         cd = meta["call_time"].split()[0].split("-")
