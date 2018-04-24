@@ -53,12 +53,9 @@ for idx in range(1, len(calls)):
             
         # Determine location string to geocode
         location = meta["location"]
-        if location == "100 S HUGHEY AV":
-            location = ""
-        else:
-            location = location.replace("CENTRAL FLORIDA GREENEWAY", "FL-417")
-            if " / " in location:
-                location = location.replace(" / ", " AND ")
+        location = location.replace("CENTRAL FLORIDA GREENEWAY", "FL-417")
+        if " / " in location:
+            location = location.replace(" / ", " AND ")
         
         row_data["location"] = location
         row_data["category"] = call_type
