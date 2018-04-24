@@ -58,6 +58,7 @@
                             icons: {
                                 Fire: { normal: iconBin + "fire.png" },
                                 FireGeneral: { normal: iconBin + "warning.png" },
+                                Alert: { normal: iconBin + "warning.png" },
                                 EMS: { normal: iconBin + "medical.png" },
                                 Patrol: { normal: iconBin + "patrol.png" },
                                 Police: { normal: iconBin + "police.png" },
