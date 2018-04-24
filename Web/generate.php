@@ -94,30 +94,47 @@
         $expired = $cL["expired"];
         $timezone = $sources[$src]["timezone"];
         
-        // Determine the call's start time. If the source specified a time, use that, otherwise
-        //   use the time the call was added to the database.
-        $callTime = $added;
+        // Determine the call's start time. Prefer the source-provided time but use other known data to fill in missing elements.
+        $addedTime = new DateTime($added);
+        
         if (isset($meta["call_time"]) and strlen($meta["call_time"]) > 0)
         {
-            // Compare the time the call was added to the database and the reported call time.
-            $addedTime = new DateTime($added);
-            $tryTime = DateTime::createFromFormat($sources[$src]["time_format"], $meta["call_time"]);
+            // Prefer the source time format but make a guess if that doesn't work out.
+            if (($tryTime = DateTime::createFromFormat($sources[$src]["time_format"], $meta["call_time"])) == false)
+                $tryTime = new DateTime($meta["call_time"]);
             
-            // If the dates are different then it could be an old call. Use the date from the time added.
-            if ($tryTime->diff($addedTime)->days != 0)
-                $tryTime->setDate($addedTime->format("Y"), $addedTime->format("m"), $addedTime->format("d"));
+            if ($tryTime !== false)
+            {
+                // If the dates are different then it could be an old call. Use the date from the time added.
+                if ($tryTime->diff($addedTime)->days != 0)
+                    $tryTime->setDate($addedTime->format("Y"), $addedTime->format("m"), $addedTime->format("d"));
+                
+                // Subtract a day if the call time is after we found it (as long as sources accurately provide data...)
+                //   This should handle calls where we don't find it until the next day.
+                if ($tryTime > $addedTime)
+                    $tryTime->sub(new DateInterval("P1D"));
+            }
+        }
+        
+        // If we successfully figured out a time, use that - otherwise use the added time.
+        $callTime = ($tryTime == false) ? $addedTime : $tryTime;
+        
+        // If a specific date was provided, use that.
+        if (isset($meta["call_date"]) and strlen($meta["call_date"]) > 0)
+        {
+            if (($tryDate = DateTime::createFromFormat($sources[$src]["time_format"], $meta["call_date"])) == false)
+                $tryDate = new DateTime($meta["call_date"]);
             
-            // As long as sources are reporting accurate data the added time should always be newer than the reported time.
-            //   This should handle calls from one day found on the next (such as a call at 23:59 found at 00:01 the next day).
-            if ($tryTime > $addedTime)
-                $tryTime->sub(new DateInterval("P1D"));
-            
-            $callTime = $tryTime->format("Y-m-d H:i:s");
+            if ($tryDate !== false)
+            {
+                // Use this date for the call date.
+                $callTime->setDate($tryDate->format("Y"), $tryDate->format("m"), $tryDate->format("d"));
+            }
         }
         
         // The call log table contains slightly more information about every call.
         //   Format: [ source, description, location, call time, closed time]
-        $tableCalls[$id] = array($src, $meta["description"], $meta["location"], $callTime, $expired);
+        $tableCalls[$id] = array($src, $meta["description"], $meta["location"], $callTime->format("Y-m-d H:i:s"), $expired);
     }
     
     // Set serialization precision for floating point numbers
