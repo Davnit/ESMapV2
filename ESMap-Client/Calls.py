@@ -24,6 +24,16 @@ def merge(old, new):
 
             # Check for changes in call data
             cm = compare(c, final[k])
+
+            # If the location has changed but the meta location hasn't, then it doesn't count.
+            if "location" in cm and ((not "meta" in cm) or (not "location" in cm["meta"])):
+                del cm["location"]
+
+            # If coordinates have changed but the meta location hasn't, it also doesn't count.
+            if "geo_lat" in cm and "geo_lng" in cm and ((not "meta" in cm) or (not "location" in cm["meta"])):
+                del cm["geo_lat"]
+                del cm["geo_lng"]
+
             if cm and len(cm) > 0:
                 changes[k] = cm
 
@@ -32,7 +42,7 @@ def merge(old, new):
 
     return final, added, removed, changes
 
-# Compares two CallData objects and returns the functional difference
+# Compares two CallData objects and returns the difference (a = old, b = new)
 def compare(a, b):
     diff = { }
     
@@ -40,29 +50,25 @@ def compare(a, b):
     repB = b.getReportData()
 
     # Compare all values in top 2 levels
-    for k,v in repB.items():
-        # Skip items where there is nothing to compare
-        if not k in repA: continue
-        if repA[k] is None: continue
-
-        if isinstance(v, dict):     # Check sub-dictionaries (metadata)
+    for key, valB in repB.items():
+        if isinstance(valB, dict) and key in repA:
+            # Check sub-dictionaries (metadata)
             sub = { }
-            for sk,sv in v.items():
-                if sv != repA[k][sk]:
-                    sub[sk] = sv
-
+            for subkey, subvalB in valB.items():
+                if not compareValues(subkey, repA[key], valB):
+                    sub[subkey] = subvalB
+                    
+            # Only report the sub if it has items
             if len(sub) > 0:
-                diff[k] = sub
-        else:
-            if v != repA[k]:
-                diff[k] = v
+                diff[key] = sub
+        elif not compareValues(key, repA, repB):
+            diff[key] = valB
 
-    # If the parsed location has changed but the meta location hasn't, then it doesn't count.
-    #  This fixes the mismatches when syncing to the server.
-    if "location" in diff and ((not "meta" in diff) or (not "location" in diff["meta"])):
-        del diff["location"];
-    
     return diff
+
+# Returns true if the values match
+def compareValues(key, dictA, dictB):
+    return (key in dictA) and (key in dictB) and (dictA[key] == dictB[key])
     
 
 class CallData():
