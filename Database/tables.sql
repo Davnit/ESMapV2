@@ -23,7 +23,7 @@ CREATE TABLE `sources` (
   `update_time` int(11) NOT NULL,
   `bounds` varchar(45) CHARACTER SET ascii DEFAULT NULL,
   `time_zone` varchar(30) CHARACTER SET ascii DEFAULT NULL,
-  `time_format` text NOT NULL,
+  `time_format` varchar(20) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
