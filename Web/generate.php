@@ -96,6 +96,7 @@
         
         // Determine the call's start time. Prefer the source-provided time but use other known data to fill in missing elements.
         $addedTime = new DateTime($added);
+        $tryTime = false;
         
         if (isset($meta["call_time"]) and strlen($meta["call_time"]) > 0)
         {
