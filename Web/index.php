@@ -39,10 +39,25 @@
                             [ "Latitude", "Longitude", "Description", "Marker" ]
                         ];
                         
+                        var geoHash = new Array();
+                        var coords, adjLat, adjLng;
+                        
                         for (var id in obj.calls) {
                             item = obj.calls[id];
                             item[2] = '<a href="./call.php?id=' + id + '">' + item[2] + '</a>';
                             
+                            adjLat = item[0];
+                            adjLng = item[1];
+                            coords = adjLat + ',' + adjLng;
+                            while (geoHash[coords] != null) {
+                                adjLat = parseFloat(item[0]) + ((Math.random() - .5) / 5000);
+                                adjLng = parseFloat(item[1]) + ((Math.random() - .5) / 5000);
+                                coords = adjLat + ',' + adjLng;
+                            }
+                            geoHash[coords] = 1;
+                            
+                            item[0] = adjLat;
+                            item[1] = adjLng;
                             data.push(item);
                         }
                     
