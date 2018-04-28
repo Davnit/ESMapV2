@@ -50,7 +50,9 @@
         $dispKey = ucwords(str_replace("_", " ", $key));
         $table[$dispKey] = $value;
     }
-
+    
+    $isMapped = (isset($data["latitude"]) and isset($data["longitude"]));
+    
 ?>
 <html>
     <head>
@@ -62,7 +64,7 @@
             function drawMap() {
                 var data = google.visualization.arrayToDataTable([
                     [ "Latitude", "Longitude" ],
-                    <?php print("[" . $data["latitude"] . ", " . $data["longitude"] . "]\n"); ?>
+                    <?php echo ($isMapped ? "[" . $data["latitude"] . ", " . $data["longitude"] . "]" : "[0,0]") . "\n"; ?>
                 ]);
                 
                 var options = {
@@ -73,8 +75,8 @@
                     zoomLevel: 16
                 };
                 
-                var map = new google.visualization.Map(document.getElementById("map"));
-                map.draw(data, options);
+                <?php if (!$isMapped) echo "//"; ?>var map = new google.visualization.Map(document.getElementById("map"));
+                <?php if (!$isMapped) echo "//"; ?>map.draw(data, options);
             }
         </script>
         
@@ -85,6 +87,7 @@
                 float: left;
                 height: 100%;
                 width: 50%;
+                text-align: center;
             }
 
             #call_info {
@@ -121,7 +124,7 @@
 <?php include "header.php"; ?>
 
         <div id="content">
-            <div id="map"></div>
+            <div id="map"><?php if (!$isMapped) echo "<table><tr><td>No map data.</td></tr></table>"; ?></div>
             <div id="call_info">
                 <table>
 <?php
