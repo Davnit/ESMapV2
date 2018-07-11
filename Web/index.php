@@ -5,94 +5,6 @@
 ?><html>
     <head>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
-        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-        <script type="text/javascript">
-            var lastUpdate = null;
-            var timerID = null;
-            var map = null;
-            
-            google.charts.load("current", { "packages": [ "map" ] });
-            google.charts.setOnLoadCallback(startup);
-            
-            function startup() {
-                var mapDiv = document.getElementById("map");
-                mapDiv.addEventListener("mousedown", resetTimer);
-                
-                map = new google.visualization.Map(mapDiv);
-                
-                populateMap();
-                timerID = setInterval(populateMap, <?php echo (intval($config["page_refresh"]) * 1000); ?>);
-            }
-            
-            function populateMap() {
-                $.ajax("data/livemap.json", { cache: false }).done(function(obj) {
-                    var updateTime = new Date(obj.updated);
-                    
-                    if (lastUpdate == null || updateTime > lastUpdate) {
-                        lastUpdate = updateTime;
-                        
-                        var localTime = new Date(0);
-                        localTime.setUTCSeconds(obj.updated);
-                        document.getElementById("updateTime").innerHTML = "Updated: " + localTime.toString();
-                        
-                        var data = [
-                            [ "Latitude", "Longitude", "Description", "Marker" ]
-                        ];
-                        
-                        var geoHash = new Array();
-                        var coords, adjLat, adjLng;
-                        
-                        for (var id in obj.calls) {
-                            item = obj.calls[id];
-                            item[2] = '<a href="./call.php?id=' + id + '">' + item[2] + '</a>';
-                            
-                            adjLat = item[0];
-                            adjLng = item[1];
-                            coords = adjLat + ',' + adjLng;
-                            while (geoHash[coords] != null) {
-                                adjLat = parseFloat(item[0]) + ((Math.random() - .5) / 5000);
-                                adjLng = parseFloat(item[1]) + ((Math.random() - .5) / 5000);
-                                coords = adjLat + ',' + adjLng;
-                            }
-                            geoHash[coords] = 1;
-                            
-                            item[0] = adjLat;
-                            item[1] = adjLng;
-                            data.push(item);
-                        }
-                    
-                        var iconBin = "<?php echo $config["icon_bin"]; ?>";
-                        
-                        var options = {
-                            showTooltip: false,
-                            showInfoWindow: true,
-                            enableScrollWheel: true, 
-                            mapType: "normal",
-                            useMapTypeControl: true,
-                            
-                            icons: {
-                                Fire: { normal: iconBin + "fire.png" },
-                                FireGeneral: { normal: iconBin + "warning.png" },
-                                Alert: { normal: iconBin + "warning.png" },
-                                EMS: { normal: iconBin + "medical.png" },
-                                Patrol: { normal: iconBin + "patrol.png" },
-                                Police: { normal: iconBin + "police.png" },
-                                Hazmat: { normal: iconBin + "biohazard.png" },
-                                Death: { normal: iconBin + "death.png" },
-                                Traffic: { normal: iconBin + "traffic.png" }
-                            }
-                        };
-                        
-                        map.draw(google.visualization.arrayToDataTable(data), options);
-                    }
-                });
-            }
-            
-            function resetTimer() {
-                clearInterval(timerID);
-                timerID = setInterval(populateMap, <?php echo (intval($config["map_activity_delay"]) * 1000); ?>);
-            }
-        </script>
         
         <link rel="stylesheet" href="css/main.css">
         <style type="text/css">
@@ -124,5 +36,128 @@
         <div id="footer">
             <div id="updateTime"></div>
         </div>
+        
+        <script type="text/javascript">
+            var lastUpdate = null;
+            var infoWindow = null;
+            var timerID = null;
+            var map = null;
+            var markers = null;
+            var initialized = false;
+            
+            var iconBase = "<?php echo $config["icon_bin"]; ?>";
+            var icons = {
+                Fire: { icon: iconBase + "fire.png" },
+                FireGeneral: { icon: iconBase + "warning.png" },
+                Alert: { icon: iconBase + "warning.png" },
+                EMS: { icon: iconBase + "medical.png" },
+                Patrol: { icon: iconBase + "patrol.png" },
+                Police: { icon: iconBase + "police.png" },
+                Hazmat: { icon: iconBase + "biohazard.png" },
+                Death: { icon: iconBase + "death.png" },
+                Traffic: { icon: iconBase + "traffic.png" }
+            };
+            
+            function startup() {
+                var options = {
+                    center: { lat: 28.48449, lng: -81.25188 },
+                    gestureHandling: 'greedy',
+                    zoom: 12
+                };
+                map = new google.maps.Map(document.getElementById("map"), options);
+                infoWindow = new google.maps.InfoWindow();
+                
+                markers = [];
+                populateMap();
+                    
+                timerID = setInterval(populateMap, <?php echo (intval($config["page_refresh"]) * 1000); ?>);
+            }
+            
+            function populateMap() {
+                $.ajax("data/livemap.json", { cache: false }).done(function(obj) {
+                    var updateTime = new Date(0);
+                    updateTime.setUTCSeconds(obj.updated);
+                    
+                    if (updateTime <= lastUpdate)
+                        return;
+                    
+                    lastUpdate = updateTime;
+                    document.getElementById("updateTime").innerHTML = "Updated: " + updateTime.toString();
+                    
+                    var geoHash = [];
+                    
+                    // Check over existing markers for updates and removals
+                    for (var id in markers) {
+                        var marker = markers[id];
+                        
+                        if (id in obj.calls) {
+                            // Call still active, update info
+                            var item = obj.calls[id];
+                            
+                            marker.setPosition(getUniquePoint(geoHash, item[0], item[1]));
+                            marker.setIcon(icons[item[3]].icon);
+                            marker.setTitle(item[2]);
+                        } else {
+                            // Call expired, remove from map.
+                            marker.setMap(null);
+                            delete markers[id];
+                        }
+                    }
+                    
+                    // Add new calls
+                    for (id in obj.calls) {
+                        var item = obj.calls[id];
+                        
+                        if (!(id in markers)) {
+                            var marker = createMarker(id, item);
+                            marker.setMap(map);
+                            marker.setPosition(getUniquePoint(geoHash, item[0], item[1]));
+                            
+                            marker.addListener('click', function() { 
+                                infoWindow.setContent(this.title + ' [<a href="./call.php?id=' + this.call_id + '">Details</a>]');
+                                infoWindow.open(map, this);
+                            });
+                            
+                            markers[id] = marker;
+                        }
+                    }
+                    
+                    // First time load, fit map to markers.
+                    if (!initialized) {
+                        var bounds = new google.maps.LatLngBounds();
+                        for (var id in markers) {
+                            bounds.extend(markers[id].getPosition());
+                        }
+                        map.setCenter(bounds.getCenter());
+                        map.fitBounds(bounds);
+                        initialized = true;
+                    }
+                });
+            }
+            
+            function getUniquePoint(hashes, lat, lng) {
+                var adjLat = lat;
+                var adjLng = lng;
+                var coords = adjLat + ',' + adjLng;
+                
+                while (hashes[coords] != null) {
+                    adjLat = parseFloat(lat) + ((Math.random() - .5) / 5000);
+                    adjLng = parseFloat(lng) + ((Math.random() - .5) / 5000);
+                    coords = adjLat + ',' + adjLng;
+                }
+                hashes[coords] = 1;
+                return { lat: adjLat, lng: adjLng };
+            }
+            
+            function createMarker(id, item) {
+                return new google.maps.Marker({
+                    icon: icons[item[3]].icon,
+                    title: item[2],
+                    call_id: id
+                });
+            }
+        </script>
+        
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key=<?php echo $config["maps_api_key"]; ?>&callback=startup"></script>
     </body>
 </html>

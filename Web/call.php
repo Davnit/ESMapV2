@@ -55,33 +55,8 @@
     
 ?>
 <html>
-    <head>
-        <script type="text/javascript" src="https://www.google.com/jsapi"></script>
-        <script type="text/javascript">
-            google.load("visualization", "1", { packages: [ "map" ] });
-            google.setOnLoadCallback(drawMap);
-            
-            function drawMap() {
-                var data = google.visualization.arrayToDataTable([
-                    [ "Latitude", "Longitude" ],
-                    <?php echo ($isMapped ? "[" . $data["latitude"] . ", " . $data["longitude"] . "]" : "[0,0]") . "\n"; ?>
-                ]);
-                
-                var options = {
-                    showTip: false,
-                    enableScrollWheel: true,
-                    mapType: 'normal',
-                    useMapTypeControl: true,
-                    zoomLevel: 16
-                };
-                
-                <?php if (!$isMapped) echo "//"; ?>var map = new google.visualization.Map(document.getElementById("map"));
-                <?php if (!$isMapped) echo "//"; ?>map.draw(data, options);
-            }
-        </script>
-        
+    <head>        
         <link rel="stylesheet" href="css/main.css">
-        
         <style type="text/css">
             #map {
                 float: left;
@@ -124,7 +99,7 @@
 <?php include "header.php"; ?>
 
         <div id="content">
-            <div id="map"><?php if (!$isMapped) echo "<table><tr><td>No map data.</td></tr></table>"; ?></div>
+            <div id="map"></div>
             <div id="call_info">
                 <table>
 <?php
@@ -137,5 +112,28 @@
 ?>
             </div>
         </div>
+        
+        <script type="text/javascript">
+            function drawMap() {
+                <?php if ($isMapped) echo "var position = { lat: " . $data["latitude"] . ", lng: " . $data["longitude"] . " };"; ?>
+                var options = {
+                    gestureHandling: 'greedy',
+                    <?php
+                        if ($isMapped) {
+                            echo "center: position,\n";
+                            echo "zoom: 16\n";
+                        } else {
+                            echo "center: { lat: 28.48449, lng: -81.25188 },\n";
+                            echo "zoom: 12";
+                        }
+                    ?>
+                };
+                
+                var map = new google.maps.Map(document.getElementById("map"), options);
+                <?php if ($isMapped) echo "var marker = new google.maps.Marker({ map: map, position: position });"; ?>
+            }
+        </script>
+        
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key=<?php echo $config["maps_api_key"]; ?>&callback=drawMap"></script>
     </body>
 </html>
