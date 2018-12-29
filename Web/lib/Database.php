@@ -6,6 +6,8 @@
     $db = new PDO($dsn, $config["db_user"], $config["db_pass"]);
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     
+    $prefix = $config["db_prefix"];
+    
     function getData($sql, $values = array())
     {
         global $db;
@@ -18,7 +20,7 @@
     
     function insertRows($table, $fields, $data, $handleDuplicates = false)
     {
-        global $db;
+        global $db, $prefix;
         
         $db->beginTransaction();
         
@@ -42,7 +44,7 @@
         }
         
         // Build the query
-        $sql = sprintf("INSERT INTO %s (%s) VALUES %s", $table, implode(",", $fields), implode(",", $rows));
+        $sql = sprintf("INSERT INTO %s (%s) VALUES %s", $prefix . $table, implode(",", $fields), implode(",", $rows));
         if ($handleDuplicates !== false)
         {
             $sql .= " ON DUPLICATE KEY " . $handleDuplicates;
@@ -58,19 +60,19 @@
     
     function updateTimestamps($table, $stampField, $keyField = "", $keyValues = null)
     {
-        global $db;
+        global $db, $prefix;
         
         $db->beginTransaction();
         
         if (strlen($keyField) > 0 and $keyValues !== null and sizeof($keyValues) > 0)
         {
-            $sql = sprintf("UPDATE %s SET %s = NOW() WHERE %s IN (%s)", $table, $stampField, $keyField, implode(",", array_fill(0, sizeof($keyValues), "?")));
+            $sql = sprintf("UPDATE %s SET %s = NOW() WHERE %s IN (%s)", $prefix . $table, $stampField, $keyField, implode(",", array_fill(0, sizeof($keyValues), "?")));
             $statement = $db->prepare($sql);
             $statement->execute($keyValues);
         }
         else
         {
-            $sql = sprintf("UPDATE %s SET %s = NOW()", $table, $stampField);
+            $sql = sprintf("UPDATE %s SET %s = NOW()", $prefix . $table, $stampField);
             $statement = $db->prepare($sql);
             $statement->execute();
         }

@@ -5,6 +5,7 @@
         "db_name" => "esmap",
         "db_user" => "esmap",
         "db_pass" => "",
+        "db_prefix" => "",
         
         "app_title" => "Orange County Emergency Services Activity",
         "client_key" => "",

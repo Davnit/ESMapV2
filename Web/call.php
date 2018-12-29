@@ -22,9 +22,11 @@
     
     require_once "lib/Database.php";
     
-    $sql = "SELECT c.category, c.added, c.expired, c.meta, g.latitude, g.longitude, s.tag FROM calls c ";
-    $sql .= "LEFT JOIN geocodes g on g.id = c.geoid ";
-    $sql .= "LEFT JOIN sources s on s.id = c.source ";
+    $db_prefix = $config["db_prefix"];
+    
+    $sql = "SELECT c.category, c.added, c.expired, c.meta, g.latitude, g.longitude, s.tag FROM " . $db_prefix . "calls c ";
+    $sql .= "LEFT JOIN " . $db_prefix . "geocodes g on g.id = c.geoid ";
+    $sql .= "LEFT JOIN " . $db_prefix . "sources s on s.id = c.source ";
     $sql .= "WHERE c.id = ?";
     
     $statement = $db->prepare($sql);

@@ -43,10 +43,13 @@
         "data" => array()
     );
     
+    // from the database.php include
+    $db_prefix = $config["db_prefix"];
+    
     switch ($request)
     {
         case 1:     # Source assignments
-            $data = getData("SELECT id, tag, url, parser, update_time FROM sources ORDER BY id");
+            $data = getData("SELECT id, tag, url, parser, update_time FROM " . $db_prefix . "sources");
             
             $sources = array();
             foreach ($data as $d)
@@ -57,8 +60,8 @@
             break;
             
         case 2:     # Client/server sync
-            $sql = "SELECT c.source, c.cid, g.location, c.category, c.meta FROM calls c ";
-            $sql .= "LEFT JOIN geocodes g ON c.geoid = g.id ";
+            $sql = "SELECT c.source, c.cid, g.location, c.category, c.meta FROM " . $db_prefix . "calls c ";
+            $sql .= "LEFT JOIN " . $db_prefix . "geocodes g ON c.geoid = g.id ";
             $sql .= "WHERE expired IS NULL ORDER BY c.id ASC";
             $data = getData($sql);
             
@@ -75,7 +78,7 @@
             break;
             
         case 3:     # Geocode requests
-            $data = getData("SELECT id, location FROM geocodes WHERE results IS NULL AND latitude IS NULL AND longitude IS NULL ORDER BY id DESC LIMIT 20");
+            $data = getData("SELECT id, location FROM " . $db_prefix . "geocodes WHERE results IS NULL AND latitude IS NULL AND longitude IS NULL ORDER BY id DESC LIMIT 20");
             
             $geo = array();
             foreach ($data as $d)

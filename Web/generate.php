@@ -10,12 +10,10 @@
     }
     
     $config = require("lib/Config.php");
+    $db_prefix = $config["db_prefix"];
     
     // Get a list of sources
-    $sourceList = getData("SELECT id, tag, bounds, time_zone, time_format FROM sources");
-    
-    // Get a lookup of source ID -> tag
-    $tags = 
+    $sourceList = getData("SELECT id, tag, bounds, time_zone, time_format FROM " . $db_prefix . "sources");
     
     // Make a multidimensional array of source data
     $sources = array();
@@ -30,8 +28,8 @@
     }
     
     // Get list of active or recently expired calls.
-    $sql = "SELECT c.id, c.source, c.category, c.meta, c.added, c.expired, g.latitude, g.longitude FROM calls c ";
-    $sql .= "LEFT JOIN geocodes g ON g.id = c.geoid ";
+    $sql = "SELECT c.id, c.source, c.category, c.meta, c.added, c.expired, g.latitude, g.longitude FROM " . $db_prefix . "calls c ";
+    $sql .= "LEFT JOIN " . $db_prefix . "geocodes g ON g.id = c.geoid ";
     $sql .= "WHERE c.expired IS NULL";
 
     // Include recently expired calls
