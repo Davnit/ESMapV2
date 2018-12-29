@@ -24,7 +24,7 @@
     
     $db_prefix = $config["db_prefix"];
     
-    $sql = "SELECT c.category, c.added, c.expired, c.meta, g.latitude, g.longitude, s.tag FROM " . $db_prefix . "calls c ";
+    $sql = "SELECT c.category, c.added, c.expired, c.meta, g.latitude, g.longitude, s.tag, s.time_zone FROM " . $db_prefix . "calls c ";
     $sql .= "LEFT JOIN " . $db_prefix . "geocodes g on g.id = c.geoid ";
     $sql .= "LEFT JOIN " . $db_prefix . "sources s on s.id = c.source ";
     $sql .= "WHERE c.id = ?";
@@ -38,12 +38,13 @@
     }
     
     $data = $statement->fetch(PDO::FETCH_ASSOC);
+    $timezone = new DateTimeZone($data["time_zone"]);
     
     $table = array(
         "Source" => $data["tag"],
         "Category" => $data["category"],
-        "Found" => $data["added"],
-        "Closed" => $data["expired"],
+        "Found" => (new DateTime($data["added"]))->setTimezone($timezone)->format("Y-m-d H:i:s"),
+        "Closed" => (new DateTime($data["expired"]))->setTimezone($timezone)->format("Y-m-d H:i:s")
     );
     
     $meta = json_decode($data["meta"], true);

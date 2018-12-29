@@ -131,6 +131,14 @@
             }
         }
         
+        // Convert expired time to local time.
+        if (strlen(trim($expired)) > 0)
+        {
+            $expDate = new DateTime($expired, new DateTimeZone("Etc/UTC"));
+            $expDate->setTimeZone(new DateTimeZone($timezone));
+            $expired = $expDate->format("Y-m-d H:i:s");
+        }
+        
         // The call log table contains slightly more information about every call.
         //   Format: [ source, description, location, call time, closed time]
         $tableCalls[$id] = array($src, $meta["description"], $meta["location"], $callTime->format("Y-m-d H:i:s"), $expired);
