@@ -24,6 +24,8 @@
         </style>
         
         <title>Live Map - <?php echo $config["app_title"]; ?></title>
+        
+        <meta name="viewport" content="initial-scale=0.75, user-scalable=false">
     </head>
     
     <body>
