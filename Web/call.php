@@ -24,7 +24,7 @@
     
     $db_prefix = $config["db_prefix"];
     
-    $sql = "SELECT c.category, c.added, c.expired, c.meta, g.latitude, g.longitude, s.tag, s.time_zone FROM " . $db_prefix . "calls c ";
+    $sql = "SELECT c.category, c.cid, c.added, c.expired, c.meta, g.latitude, g.longitude, s.tag, s.time_zone FROM " . $db_prefix . "calls c ";
     $sql .= "LEFT JOIN " . $db_prefix . "geocodes g on g.id = c.geoid ";
     $sql .= "LEFT JOIN " . $db_prefix . "sources s on s.id = c.source ";
     $sql .= "WHERE c.id = ?";
@@ -48,6 +48,10 @@
         "Found" => (new DateTime($data["added"], $utc_tz))->setTimezone($local_tz)->format("Y-m-d H:i:s"),
         "Closed" => (new DateTime($data["expired"], $utc_tz))->setTimezone($local_tz)->format("Y-m-d H:i:s")
     );
+    
+    if ($data["expired"] == null) {
+        $table["Closed"] = "";
+    }
     
     $meta = json_decode($data["meta"], true);
     foreach ($meta as $key => $value)
