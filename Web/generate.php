@@ -29,16 +29,43 @@
     
     // Get list of active or recently expired calls.
     $sql = "SELECT c.id, c.source, c.category, c.meta, c.added, c.expired, g.latitude, g.longitude FROM " . $db_prefix . "calls c ";
-    $sql .= "LEFT JOIN " . $db_prefix . "geocodes g ON g.id = c.geoid ";
-    $sql .= "WHERE c.expired IS NULL";
+    $sql .= "LEFT JOIN " . $db_prefix . "geocodes g ON g.id = c.geoid";
+    
+    $custom = false;
+    $values = array();
+    if (isset($_GET["start"])) {
+        $startTime = $_GET["start"];
+        $values[] = $startTime;
+        $sql .= " WHERE c.added >= ?";
+        
+        if (isset($_GET["end"])) {
+            $sql .= " AND c.added <= ?";
+            $values[] = $_GET["end"];
+        } else {
+            $sql .= " AND c.added <= (? + INTERVAL 24 HOUR)";
+            $values[] = $startTime;
+        }
+        $custom = true;
+        
+    } else {
+        // Default where clause
+        $sql .= " WHERE c.expired IS NULL";
 
-    // Include recently expired calls
-    $historyTime = $config["history_time"];
-    if (strlen($historyTime) > 0) {
-        $sql .= " OR (c.expired >= NOW() - INTERVAL $historyTime)";
+        // Include recently expired calls
+        $historyTime = $config["history_time"];
+        if (strlen($historyTime) > 0) {
+            $sql .= " OR (c.expired >= (NOW() - INTERVAL $historyTime))";
+        }
     }
     
-    $callList = getData($sql);
+    if (isset($_GET["category"])) {
+        $catList = explode(",", $_GET["category"]);
+        $sql .= " AND category IN (" . implode(",", array_fill(0, sizeof($catList), "?")) . ")";
+        $values = array_merge($values, $catList);
+        $custom = true;
+    }
+    
+    $callList = getData($sql . ";", $values);
     
     // Organize data to be written
     $mapCalls = array();
@@ -164,18 +191,48 @@
     ini_set("serialize_precision", -1);
     
     // Create the object for the live map and serialize it
-    $obj = array(
+    $mapData = array(
         "updated" => time(),
         "calls" => $mapCalls
     );
-    file_put_contents("data/livemap.json", json_encode($obj));
     
     // Create the object for the call list and serialize it.
-    $obj = array(
+    $listData = array(
         "updated" => time(),
         "sources" => array_column($sourceList, "tag", "id"),
         "calls" => $tableCalls
     );
-    file_put_contents("data/call_log.json", json_encode($obj));
+    
+    // Determine the type of output
+    $mode = (isset($_GET["mode"]) ? $_GET["mode"] : "0");
+    switch ($mode) {
+        case "0":           // Save to files     
+            $mapFile = "livemap";
+            $listFile = "call_log";
+            
+            if (isset($_GET["prefix"])) {
+                $prefix = $_GET["prefix"];
+            } elseif ($custom == true) {
+                $prefix = "temp";
+            }
+            
+            if (isset($prefix)) {
+                $mapFile = $prefix . "-map";
+                $listFile = $prefix . "-list";
+            }
+            
+            file_put_contents("data/$mapFile.json", json_encode($mapData));
+            file_put_contents("data/$listFile.json", json_encode($listData));
+            
+            break;
+            
+        case "1":           // Output map data only
+            print(json_encode($mapData));
+            break;
+            
+        case "2":           // Output list data only
+            print(json_encode($listData));
+            break;
+    }
 
 ?>

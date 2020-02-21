@@ -4,6 +4,8 @@
     
     $siteTitle = $config["app_title"];
     
+    $source = (isset($_GET["src"]) ? $_GET["src"] . "-list" : "call_log");
+    
 ?><html>
     <head>
 <?php if (strlen($config["analytics_tag"]) > 0) {?>
@@ -37,7 +39,7 @@
             }
             
             function populateTable() {
-                $.ajax("data/call_log.json", { cache: false }).done(function(obj) {
+                $.ajax("data/<?php echo $source; ?>.json", { cache: false }).done(function(obj) {
                     var updateTime = new Date(obj.updated);
 
                     if (lastUpdate == null || updateTime > lastUpdate) {
@@ -75,7 +77,7 @@
                 if (selection.length > 0) {
                     var row = selection[0].row;
                     if (row in IDList) {
-                        window.location.href = "call.php?id=" + IDList[(Object.keys(IDList).length - 1) - row];
+                        window.location.href = "call?id=" + IDList[(Object.keys(IDList).length - 1) - row];
                     }
                 }
             }
