@@ -83,6 +83,7 @@
             }
         </script>
         
+        <link rel="icon" href="icon.png">
         <link rel="stylesheet" href="css/main.css">
         <style type="text/css">
             #table {
