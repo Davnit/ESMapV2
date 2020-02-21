@@ -3,6 +3,11 @@
     $config = require("lib/Config.php");
     
     $siteTitle = $config["app_title"];
+    if (strlen($config["maps_api_key"]) == 0) {
+        die("Google Maps API key not set.
+            For more information go to <a href=\"https://developers.google.com/maps/gmp-get-started\">Google Maps Platform Documentation</a>.");
+    }
+    
     function showError($message)
     {
         die($message);
