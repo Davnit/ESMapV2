@@ -91,16 +91,30 @@
         $added = $cL["added"];
         $expired = $cL["expired"];
         $timezone = $sources[$src]["timezone"];
+        $time_format = $sources[$src]["time_format"];
+        
+        $has_tz = false;
+        $tz_format_chars = str_split("eOPT");
+        foreach ($tz_format_chars as $c) {
+            if (strpos($time_format, $c) > 0) {
+                $has_tz = true;
+                break;
+            }
+        }
+        
+        // Time zones for conversion
+        $utc_tz = new DateTimeZone("Etc/UTC");
+        $local_tz = new DateTimeZone($timezone);
         
         // Determine the call's start time. Prefer the source-provided time but use other known data to fill in missing elements.
-        $addedTime = new DateTime($added);
+        $addedTime = new DateTime($added, $utc_tz);
         $tryTime = false;
         
         if (isset($meta["call_time"]) and strlen($meta["call_time"]) > 0)
         {
             // Prefer the source time format but make a guess if that doesn't work out.
-            if (($tryTime = DateTime::createFromFormat($sources[$src]["time_format"], $meta["call_time"])) == false)
-                $tryTime = new DateTime($meta["call_time"]);
+            if (($tryTime = DateTime::createFromFormat($time_format, $meta["call_time"], ($has_tz ? null : $local_tz))) == false)
+                $tryTime = new DateTime($meta["call_time"], $local_tz);
             
             if ($tryTime !== false)
             {
@@ -117,12 +131,13 @@
         
         // If we successfully figured out a time, use that - otherwise use the added time.
         $callTime = ($tryTime == false) ? $addedTime : $tryTime;
+        $callTime->setTimeZone($local_tz);
         
         // If a specific date was provided, use that.
         if (isset($meta["call_date"]) and strlen($meta["call_date"]) > 0)
         {
-            if (($tryDate = DateTime::createFromFormat($sources[$src]["time_format"], $meta["call_date"])) == false)
-                $tryDate = new DateTime($meta["call_date"]);
+            if (($tryDate = DateTime::createFromFormat($time_format, $meta["call_date"], $local_tz)) == false)
+                $tryDate = new DateTime($meta["call_date"], $local_tz);
             
             if ($tryDate !== false)
             {
@@ -134,8 +149,8 @@
         // Convert expired time to local time.
         if (strlen(trim($expired)) > 0)
         {
-            $expDate = new DateTime($expired, new DateTimeZone("Etc/UTC"));
-            $expDate->setTimeZone(new DateTimeZone($timezone));
+            $expDate = new DateTime($expired, $utc_tz);
+            $expDate->setTimeZone($local_tz);
             $expired = $expDate->format("Y-m-d H:i:s");
         }
         

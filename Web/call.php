@@ -38,13 +38,15 @@
     }
     
     $data = $statement->fetch(PDO::FETCH_ASSOC);
-    $timezone = new DateTimeZone($data["time_zone"]);
+    
+    $utc_tz = new DateTimeZone("Etc/UTC");
+    $local_tz = new DateTimeZone($data["time_zone"]);
     
     $table = array(
         "Source" => $data["tag"],
         "Category" => $data["category"],
-        "Found" => (new DateTime($data["added"]))->setTimezone($timezone)->format("Y-m-d H:i:s"),
-        "Closed" => (new DateTime($data["expired"]))->setTimezone($timezone)->format("Y-m-d H:i:s")
+        "Found" => (new DateTime($data["added"], $utc_tz))->setTimezone($local_tz)->format("Y-m-d H:i:s"),
+        "Closed" => (new DateTime($data["expired"], $utc_tz))->setTimezone($local_tz)->format("Y-m-d H:i:s")
     );
     
     $meta = json_decode($data["meta"], true);
