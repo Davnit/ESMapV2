@@ -2,6 +2,13 @@
     
     $config = require("Config.php");
     
+    $keys_to_check = array("db_host", "db_name", "db_user", "db_pass");
+    foreach ($keys_to_check as $key) {
+        if (strlen($config[$key]) == 0) {
+            die("Missing database configuration key: $key");
+        }
+    }
+    
     $dsn = "mysql:host=" . $config["db_host"] . ";dbname=" . $config["db_name"];
     $db = new PDO($dsn, $config["db_user"], $config["db_pass"]);
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
