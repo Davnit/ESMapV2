@@ -1,0 +1,2 @@
+# Block access to files
+Deny from all
