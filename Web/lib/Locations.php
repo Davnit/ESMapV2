@@ -125,4 +125,9 @@
         return $location;
     }
     
+    function checkBounds($coords, $bounds)
+    {
+        return !($coords[0] < $bounds[0] or $coords[1] < $bounds[1] or $coords[0] > $bounds[2] or $coords[1] > $bounds[3]);
+    }
+    
 ?>
