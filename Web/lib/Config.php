@@ -7,7 +7,7 @@
         "db_pass" => "",
         "db_prefix" => "",
         
-        "app_title" => "Orange County Emergency Services Activity",
+        "app_title" => "Emergency Services Activity - Orange County, FL",
         "client_key" => "",
         "maps_api_key" => "",
         
