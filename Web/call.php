@@ -2,6 +2,7 @@
     
     $config = require("lib/Config.php");
     
+    $siteTitle = $config["app_title"];
     function showError($message)
     {
         die($message);
@@ -62,9 +63,25 @@
     
     $isMapped = (isset($data["latitude"]) and isset($data["longitude"]));
     
+    // For page metadata
+    $callNumber = (in_array("call_number", $meta) ? $meta["call_number"] : $data["cid"]);
+    $pageDesc = "Details for " . $data["tag"] . " call #" . $callNumber . ": " . $meta["description"] . " at " . $meta["location"] . ".";
+    
 ?>
 <html>
-    <head>        
+    <head>
+<?php if (strlen($config["analytics_tag"]) > 0) {?>
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=<?php echo $config["analytics_tag"]; ?>"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', '<?php echo $config["analytics_tag"]; ?>');
+        </script>
+<?php } ?>
+        <link rel="icon" href="icon.png">
         <link rel="stylesheet" href="css/main.css">
         <style type="text/css">
             #map {
@@ -101,7 +118,20 @@
             }
         </style>
         
-        <title>Call Details - <?php echo $config["app_title"]; ?></title>
+        <title>Call Details - <?php echo $siteTitle; ?></title>
+<?php
+    if (strlen($config["app_title"]) > 0) { ?>
+        <meta property="og:title" content="Call Details - <?php echo $siteTitle; ?>" />
+        <meta property="og:type" content="object" />
+<?php }
+    if (strlen($config["url_base"]) > 0) { ?>
+        <meta property="og:url" content="<?php echo $config["url_base"] . "call?id=$id"; ?>" />
+<?php } 
+    if (strlen($config["og_site_name"]) > 0) { ?>
+        <meta property="og:site_name" content="<?php echo $config["og_site_name"]; ?>"/>
+<?php } ?>
+        <meta property="og:description" content="<?php echo $pageDesc; ?>" />
+        <meta name="description" content="<?php echo $pageDesc; ?>" />
     </head>
     
     <body>

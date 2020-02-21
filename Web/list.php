@@ -2,8 +2,21 @@
 
     $config = require("lib/Config.php");
     
+    $siteTitle = $config["app_title"];
+    
 ?><html>
     <head>
+<?php if (strlen($config["analytics_tag"]) > 0) {?>
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=<?php echo $config["analytics_tag"]; ?>"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', '<?php echo $config["analytics_tag"]; ?>');
+        </script>
+<?php } ?>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
         <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
         <script type="text/javascript">
@@ -75,7 +88,25 @@
             }
         </style>
         
-        <title>Call Log - <?php echo $config["app_title"]; ?></title>
+        <title>Call Log - <?php echo $siteTitle; ?></title>
+<?php
+    if (strlen($config["app_title"]) > 0) { ?>
+        <meta property="og:title" content="Call Log - <?php echo $siteTitle; ?>" />
+        <meta property="og:type" content="website" />
+<?php }
+    if (strlen($config["url_base"]) > 0) { ?>
+        <meta property="og:url" content="<?php echo $config["url_base"]; ?>list" />
+<?php } 
+    if (strlen($config["og_site_name"]) > 0) { ?>
+        <meta property="og:site_name" content="<?php echo $config["og_site_name"]; ?>"/>
+<?php }
+    if (strlen($config["og_description"]) > 0) { ?>
+        <meta property="og:description" content="<?php echo $config["og_description"]; ?>" />
+        <meta name="description" content="<?php echo $config["og_description"]; ?>" />
+<?php }
+    if (strlen($config["seo_keywords"]) > 0) { ?>
+        <meta name="keywords" content="<?php echo $config["seo_keywords"]; ?>" />
+<?php } ?>
     </head>
     
     <body>
