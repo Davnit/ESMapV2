@@ -27,15 +27,15 @@ for idx in range(1, len(calls)):
         meta["zone"]                = getValue(call, "ZONE")
         meta["district"]            = getValue(call, "RD")
         meta["description"]         = getValue(call, "DESC").title()
-        
+               
         # OCSO doesn't provide unique call numbers so we need to come up with our own semi-unique key
-        cd = meta["call_time"].split()[0].split("-")
+        cd = meta["call_time"].split()[0].split("/")
         row_data["key"] = '-'.join([ "OCSO", ''.join([ cd[2], cd[0], cd[1] ]), meta["call_number"] ])
         
         # Interpret call type from description
         call_type = "Police"
         desc = meta["description"].upper()
-        
+            
         if "FIRE" in desc and not ("ASSIST" in desc):
             call_type = "Fire"
         elif "MEDICAL ONLY" in desc:

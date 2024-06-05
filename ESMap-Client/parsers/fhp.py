@@ -67,7 +67,7 @@ for incident in dataObj["features"]:
             location = location.replace("SR-", "FL-")
         
         category = "Traffic"
-        if desc.upper().startswith("FIRE"):
+        if "FIRE" in desc.upper() or "BURN" in desc.upper():
             category = "Fire"
         elif "ALERT" in desc.upper():
             category = "Alert"

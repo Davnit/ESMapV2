@@ -6,7 +6,10 @@
 '''
 
 def getValue(xml, eName):
-    return xml.split("<" + eName + ">")[1].split("</" + eName + ">")[0].strip()
+    try:
+        return xml.split("<" + eName + ">")[1].split("</" + eName + ">")[0].strip()
+    except IndexError:
+        return ""
     
 replacements.update({
     "EW": "FL-408", "BEELINE": "FL-528", "I4": "INTERSTATE 4",
@@ -56,6 +59,9 @@ for idx in range(1, len(calls)):
         location = location.replace("CENTRAL FLORIDA GREENEWAY", "FL-417")
         if " / " in location:
             location = location.replace(" / ", " AND ")
+        ls = location.split()
+        if len(ls) > 2 and ls[1] == "BLOCK":
+            location = ls[0] + " " + ' '.join(ls[2:])
         
         row_data["location"] = location
         row_data["category"] = call_type
